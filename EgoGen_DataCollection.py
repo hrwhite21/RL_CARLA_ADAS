@@ -1,16 +1,30 @@
 import carla
 import numpy as np
-import matplotlib
 import os
 import platform
 import random
 import pygame
 
+cc = carla.ColorConverter.CityScapesPalette
+def camera_callback(camera_data, sensor_save_path):
+    cam_save_path = f"{sensor_save_path}/rgb_cam_%06d.png"
+    camera_data.save_to_disk(cam_save_path % camera_data.frame)
+    
+    return
+def seg_camera_callback(semantic_segmentation_data, sensor_save_path):
+    seg_save_path = f"{sensor_save_path}/seg_cam_%06d.png"
+    semantic_segmentation_data.save_to_disk(seg_save_path % semantic_segmentation_data.frame, cc)
+    return
+def collision_callback(collision_data):
+    print("Collision detected:\n"+str(collision_data)+'\n')
+def invasion_callback(lane_invasion_data):
+    print("Vehicle has left its lane:\n"+str(lane_invasion_data)+'\n')
+    return
+
 
 desired_town = 'Town_01Opt'
 desired_fps = 30
 client = carla.Client('localhost', 2000)
-
 client.load_world(desired_town)
 
 #Create and store all high level objects 
@@ -28,10 +42,13 @@ world.apply_settings(settings)
 
 if platform.system == 'Windows':
     save_path = "C:\CarlaGitHub\RL_CARLA_ADAS\SavedData"
+    sensor_save_path = "C:\CarlaGitHub\RL_CARLA_ADAS\SavedData\Sensors"
 elif platform.system == 'Ubuntu':
     save_path = "/data/HunterWhite/CarlaUE4/Recordings"
+    sensor_save_path = "/data/HunterWhite/CarlaUE4/Recordings/Sensors"
 
-os.makedirs(save_path, exist_ok=True)
+os.makedirs(sensor_save_path, exist_ok=True)
+
 #As an estimate, 1h recording with 50 traffic lights and 100 vehicles takes around 200MB in size.
 spawn_points = world.get_map().get_spawn_points()
 
@@ -77,10 +94,14 @@ else:
     
     try: 
         ego_camera = world.spawn_actor(camera_bp,camera_transform,attach_to=ego_vehicle, attachment_type=carla.AttachmentType.Rigid)
+        ego_camera.listen(lambda image : camera_callback(image,sensor_save_path))
         ego_segment_camera = world.spawn_actor(segment_camera_bp,segment_camera_transform,attach_to=ego_vehicle, attachment_type=carla.AttachmentType.Rigid)
+        ego_segment_camera.listen(lambda seg_image : seg_camera_callback(seg_image,sensor_save_path))
         ego_collision_sensor =  world.spawn_actor(collision_sensor_bp,collision_sensor_transformation,attach_to=ego_vehicle, attachment_type=carla.AttachmentType.Rigid)
+        ego_collision_sensor.listen(lambda coll_info : collision_callback(coll_info))    
         ego_invasion_sensor =  world.spawn_actor(lane_invasion_sensor_bp,invasion_sensor_transformation,attach_to=ego_vehicle, attachment_type=carla.AttachmentType.Rigid)
-    except:
+        ego_invasion_sensor.listen(lambda inv_info : invasion_callback(inv_info))
+                                   
         print('\n Error Loading Vehicle Sensors')
     finally:
         print('\n Loading traffic!')
@@ -104,8 +125,8 @@ for i, spawn_point in enumerate(random.sample(spawn_points, max_vehicles)):
         vehicles.append(temp)
     for vehicle in vehicles:
         vehicle.set_autopilot(True)
-        # Randomly set the probability that a vehicle will ignore traffic lights
-        traffic_manager.ignore_lights_percentage(vehicle)
+
+
 
 try:
     client.start_recorder(save_path, True)
@@ -122,6 +143,9 @@ except KeyboardInterrupt:
         except:
             actor.destoy()
     
-    
+finally:
+    if carla.world.get_actors() is not None:
+        print('\n The following actors were not destroyed. Please manually delete them.\n')
+        print(carla.world.get_actors())
 
     # DO the stuff to destroy the actos and free up computer resources.
