@@ -4,6 +4,8 @@ import matplotlib
 import os
 import platform
 import random
+import pygame
+
 
 desired_town = 'Town_01Opt'
 desired_fps = 30
@@ -110,7 +112,16 @@ try:
     while True:
         world.tick()
         # Rest of Code to capture images
+
 except KeyboardInterrupt:
     print('\n Data Collection Terminated, destroying actors and reloading world')
+    for actor in carla.world.get_actors():
+        try:
+            actor.stop()
+            actor.destroy()
+        except:
+            actor.destoy()
+    
+    
 
     # DO the stuff to destroy the actos and free up computer resources.
