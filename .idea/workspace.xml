@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="init scripts for Ego Vehicle generation and data collection from sensors">
+    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EgoGen_DataCollection.py" beforeDir="false" afterPath="$PROJECT_DIR$/EgoGen_DataCollection.py" afterDir="false" />
     </list>
@@ -60,12 +60,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/data/HunterWhite/CARLA_Hunter"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -114,12 +120,31 @@
       <option name="project" value="LOCAL" />
       <updated>1712701411634</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="linted to follow PEP8">
+      <option name="closed" value="true" />
+      <created>1712789118705</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1712789118705</updated>
+    </task>
+    <task id="LOCAL-00006" summary="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers">
+      <option name="closed" value="true" />
+      <created>1712789462329</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1712789462329</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
     <MESSAGE value="init scripts for Ego Vehicle generation and data collection from sensors" />
-    <option name="LAST_COMMIT_MESSAGE" value="init scripts for Ego Vehicle generation and data collection from sensors" />
+    <MESSAGE value="linted to follow PEP8" />
+    <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)" />
+    <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers" />
+    <option name="LAST_COMMIT_MESSAGE" value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers" />
   </component>
 </project>

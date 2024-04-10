@@ -30,10 +30,10 @@ def invasion_callback(lane_invasion_data):
     return
 
 
-desired_town = 'Town_01Opt'
+desired_town = 'Town03_Opt'
 desired_fps = 30
 client = carla.Client('localhost', 2000)
-client.load_world(desired_town)
+#client.load_world(desired_town)
 
 # Create and store all high level objects
 world = client.get_world()
@@ -54,18 +54,21 @@ if platform.system == 'Windows':
 elif platform.system == 'Ubuntu':
     os_save_path = "/data/HunterWhite/CarlaUE4/Recordings"
     sensor_os_save_path = "/data/HunterWhite/CarlaUE4/Recordings/Sensors"
+try:
+    os.makedirs(sensor_os_save_path)
+except:
+    pass
 
-os.makedirs(sensor_os_save_path="C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/Sensors",
-            exist_ok=True)
+
 
 # As an estimate, 1h recording with 50 traffic lights and 100 vehicles takes around 200MB in size.
 spawn_points = world.get_map().get_spawn_points()
 
-ego_bp = blueprint_library.filter('vehicle.mini.cooper_s_2021')
+ego_bp = blueprint_library.find('vehicle.mini.cooper_s_2021')
 ego_bp.set_attribute('role_name', 'ego')
 ego_color = random.choice(ego_bp.get_attribute('color').recommended_values)
 ego_bp.set_attribute('color', ego_color)
-ego_transform = random.shuffle(spawn_points)[0]
+ego_transform = random.shuffle(spawn_points)
 ego_vehicle = world.try_spawn_actor(ego_bp, ego_transform)
 
 vehicles_bp = blueprint_library.filter('*vehicle*')
