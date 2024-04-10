@@ -55,7 +55,7 @@ elif platform.system == 'Ubuntu':
     os_save_path = "/data/HunterWhite/CarlaUE4/Recordings"
     sensor_os_save_path = "/data/HunterWhite/CarlaUE4/Recordings/Sensors"
 
-os.makedirs(sensor_os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/Sensors",
+os.makedirs(sensor_os_save_path="C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/Sensors",
             exist_ok=True)
 
 # As an estimate, 1h recording with 50 traffic lights and 100 vehicles takes around 200MB in size.
