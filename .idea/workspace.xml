@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers">
+    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="many bugs in Data Collection script - working through them">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EgoGen_DataCollection.py" beforeDir="false" afterPath="$PROJECT_DIR$/EgoGen_DataCollection.py" afterDir="false" />
     </list>
@@ -34,12 +35,12 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "hrwhite21"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;hrwhite21&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
@@ -50,6 +51,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
@@ -62,6 +66,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.EgoGen_DataCollection.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "last_opened_file_path": "/data/HunterWhite/CARLA_Hunter"
@@ -136,7 +141,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712789462329</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="many bugs in Data Collection script - working through them">
+      <option name="closed" value="true" />
+      <created>1712790578375</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1712790578375</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -145,6 +158,63 @@
     <MESSAGE value="linted to follow PEP8" />
     <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)" />
     <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers" />
-    <option name="LAST_COMMIT_MESSAGE" value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers" />
+    <MESSAGE value="many bugs in Data Collection script - working through them" />
+    <option name="LAST_COMMIT_MESSAGE" value="many bugs in Data Collection script - working through them" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>54</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>58</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>60</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>62</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>65</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
