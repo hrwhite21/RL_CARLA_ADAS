@@ -5,6 +5,7 @@ import platform
 import random
 import glob
 import sys
+import datetime
 
 try:
     sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
@@ -14,7 +15,7 @@ try:
 except IndexError:
     pass
 cc = carla.ColorConverter.CityScapesPalette
-
+current_datetime = datetime.now().strftime('%Y_%m_%d')
 
 def camera_callback(camera_data, save_path):
     cam_save_path = f"{save_path}/rgb_cam_%06d.png"
@@ -65,10 +66,10 @@ spectator = world.get_spectator()
 print('\n', platform.system())
 if platform.system() == 'Windows':
     os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData"
-    sensor_os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/Sensors"
+    sensor_os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/Sensors/" + f"{current_datetime}"
 elif platform.system() == 'Linux':
-    os_save_path = "/data/HunterWhite/CarlaUE4/Recordings"
-    sensor_os_save_path = "~/data/HunterWhite/CarlaUE4/Recordings/Sensors"
+    os_save_path = "/data/HunterWhite/CARLA_Hunter/Recordings"
+    sensor_os_save_path = "/Recordings/Sensors/" + f"{current_datetime}"
 print(sensor_os_save_path)
 try:
     os.makedirs(sensor_os_save_path)
@@ -91,7 +92,7 @@ vehicles_bp = blueprint_library.filter('*vehicle*')
 camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
 camera_bp.set_attribute('image_size_x', str(600))
 camera_bp.set_attribute('image_size_y', str(600))
-camera_location = carla.Location(2, 0, 1)
+camera_location = carla.Location(2, 0, 3)
 camera_rotation = carla.Rotation(0, 0, 0)
 camera_transform = carla.Transform(camera_location, camera_rotation)
 
@@ -99,7 +100,7 @@ segment_camera_bp = blueprint_library.find('sensor.camera.semantic_segmentation'
 segment_camera_bp.set_attribute('image_size_x','840')
 segment_camera_bp.set_attribute('image_size_y','600')
 segment_camera_bp.set_attribute('fov','90')
-segment_camera_location = carla.Location(1.8, 0, 1.2)
+segment_camera_location = carla.Location(1.8, 0, 1.8)
 segment_camera_rotation = carla.Rotation(0, 0, 0)
 segment_camera_transform = carla.Transform(segment_camera_location, segment_camera_rotation)
 
