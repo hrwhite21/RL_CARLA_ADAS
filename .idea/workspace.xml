@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="many bugs in Data Collection script - working through them">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
+    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="changes savepath for sensor images and updates sensor locations to higher z values">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EgoGen_DataCollection.py" beforeDir="false" afterPath="$PROJECT_DIR$/EgoGen_DataCollection.py" afterDir="false" />
     </list>
@@ -64,14 +63,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.EgoGen_DataCollection.executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/data/HunterWhite/CARLA_Hunter"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.EgoGen_DataCollection.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/data/HunterWhite/CARLA_Hunter&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -80,7 +79,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-09665e90c3a7-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.15026.15" />
+        <option value="bundled-python-sdk-0509580d9d50-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.14494.241" />
       </set>
     </attachedChunks>
   </component>
@@ -149,7 +148,23 @@
       <option name="project" value="LOCAL" />
       <updated>1712790578375</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="worked through a few issues with syntax and assigning values properly ~NOTE~ TOWN03_Opt has an issue with the traffic manager that crashes the script. Have not found why.">
+      <option name="closed" value="true" />
+      <created>1712875439528</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1712875439528</updated>
+    </task>
+    <task id="LOCAL-00009" summary="changes savepath for sensor images and updates sensor locations to higher z values">
+      <option name="closed" value="true" />
+      <created>1713297844779</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1713297844779</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -159,60 +174,27 @@
     <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)" />
     <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers" />
     <MESSAGE value="many bugs in Data Collection script - working through them" />
-    <option name="LAST_COMMIT_MESSAGE" value="many bugs in Data Collection script - working through them" />
+    <MESSAGE value="worked through a few issues with syntax and assigning values properly ~NOTE~ TOWN03_Opt has an issue with the traffic manager that crashes the script. Have not found why." />
+    <MESSAGE value="changes savepath for sensor images and updates sensor locations to higher z values" />
+    <option name="LAST_COMMIT_MESSAGE" value="changes savepath for sensor images and updates sensor locations to higher z values" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>54</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>58</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>59</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>60</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>62</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>65</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>73</line>
+          <line>77</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>79</line>
+          <line>84</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
-          <line>51</line>
-          <option name="timeStamp" value="27" />
+          <line>172</line>
+          <option name="timeStamp" value="29" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

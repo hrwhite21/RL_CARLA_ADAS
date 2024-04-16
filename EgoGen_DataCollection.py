@@ -5,7 +5,7 @@ import platform
 import random
 import glob
 import sys
-import datetime
+from datetime import datetime
 
 try:
     sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
@@ -16,7 +16,7 @@ except IndexError:
     pass
 cc = carla.ColorConverter.CityScapesPalette
 current_datetime = datetime.now().strftime('%Y_%m_%d')
-
+hrs_mins = datetime.now().strftime('%H_%M')
 def camera_callback(camera_data, save_path):
     cam_save_path = f"{save_path}/rgb_cam_%06d.png"
     camera_data.save_to_disk(cam_save_path % camera_data.frame)
@@ -65,15 +65,19 @@ spectator = world.get_spectator()
 
 print('\n', platform.system())
 if platform.system() == 'Windows':
-    os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData"
-    sensor_os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/Sensors/" + f"{current_datetime}"
+    logs_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/" + f"{current_datetime}" + "/logs/"
+    sensor_os_save_path = "C:/CarlaGitHub/RL_CARLA_ADAS/SavedData/" + f"{current_datetime}" + "/Sensors/"
 elif platform.system() == 'Linux':
-    os_save_path = "/data/HunterWhite/CARLA_Hunter/Recordings"
-    sensor_os_save_path = "/Recordings/Sensors/" + f"{current_datetime}"
-print(sensor_os_save_path)
+    logs_save_path = "Recordings/" + f"{current_datetime}" + "/logs/"
+    sensor_os_save_path = "Recordings/" + f"{current_datetime}" + "/Sensors/"
+else:
+    raise RuntimeError('Error: Not Using Supported Operating System. The following Operating Systems are supported":\n'
+          'Windows\n Linux (Ubuntu 20.04), \n')
 try:
+    os.makedirs(logs_save_path)
     os.makedirs(sensor_os_save_path)
 except:
+    print('\n Could not create new directory. Check Filepath and try again.\n')
     pass
 
 
@@ -162,17 +166,22 @@ print('\n World Set to AutoPilot!')
 ego_vehicle.set_autopilot(True)
 
 try:
-   # client.start_recorder(os_save_path, True)
-    while True:
-        world.tick()
+   client.start_recorder("/data/HunterWhite/CARLA_Hunter/Recordings/2024_04_16/logs/testlog123.log") #    client.start_recorder((logs_save_path + f"{hrs_mins}.log"), True)
+    ### /home/yoon/.config/Epic/CarlaUE4/Saved/ Saves to here!
+   ### Looks like this function call is super picky about the formatting of the save path.
+   ### Good to know, but need to find a modular workaround?
+   while True:
+       world.tick()
         # Rest of Code to capture images
+
+# Can probably modify this to use the apply in abtch stuff from the docs
 
 except KeyboardInterrupt:
     print('\n Data Collection Terminated, destroying actors and reloading world')
-
+    client.stop_recorder()
     active_sensors = world.get_actors().filter('sensor.*')
     for sensor in active_sensors:
-        if sensor.is_listening:
+        if sensor.is_listening():
             sensor.stop()
         sensor.destroy()
 
@@ -181,10 +190,11 @@ except KeyboardInterrupt:
     for vehicle in active_vehicles:
         vehicle.destroy()
 
-
 finally:
     if world.get_actors().filter('sensor.*') or world.get_actors().filter('vehicle.*') is not None:
         print('\n The following actors were not destroyed. Please manually delete them.\n')
-        print(world.get_actors())
+        print(world.get_actors().filter('sensor.*'))
+        print(world.get_actors().filter('vehicle.*'))
 
+    print('Stopped Recording')
     # DO the stuff to destroy the actors and free up computer resources.
