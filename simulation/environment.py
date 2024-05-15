@@ -5,11 +5,12 @@ import pygame
 from simulation.connection import carla
 from simulation.sensors import CameraSensor, CameraSensorEnv, CollisionSensor
 from simulation.settings import *
-
-
+import serial
+from configparser import ConfigParser
+import math
 class CarlaEnvironment():
 
-    def __init__(self, client, world, town, checkpoint_frequency=100, continuous_action=True) -> None:
+    def __init__(self, client, world, town, DIL, checkpoint_frequency=100, continuous_action=True, ) -> None:
 
 
         self.client = client
@@ -40,13 +41,76 @@ class CarlaEnvironment():
         self.walker_list = list()
         self.create_pedestrians()
 
+        # Established Serial Connection to arduino if DIL is enabled
+        self.DIL = DIL
+        if DIL:
+            self.arduino = serial.Serial('COM8',19200,timeout=10,write_timeout=0)
+            self.APPMaxDisplacement = 690
+            self.BPPMaxDisplacement = 660
+            self.SWMaxDisplacement = 2750
+                    # initialize steering wheel
+            pygame.joystick.init()
 
+            joystick_count = pygame.joystick.get_count()
+            if joystick_count > 1:
+                raise ValueError("Please Connect Just One Joystick")
+
+            self._joystick = pygame.joystick.Joystick(0)
+            self._joystick.init()
+
+            self._parser = ConfigParser()
+            self._parser.read('wheel_config.ini')
+            self._steer_idx = int(
+                self._parser.get('G29 Racing Wheel', 'steering_wheel'))
+            self._throttle_idx = int(
+                self._parser.get('G29 Racing Wheel', 'throttle'))
+            self._brake_idx = int(self._parser.get('G29 Racing Wheel', 'brake'))
+            self._reverse_idx = int(self._parser.get('G29 Racing Wheel', 'reverse'))
+            self._handbrake_idx = int(
+                self._parser.get('G29 Racing Wheel', 'handbrake'))
+            self._control = carla.VehicleControl()
+            
+
+    def _parse_vehicle_wheel(self):
+            numAxes = self._joystick.get_numaxes()
+            jsInputs = [float(self._joystick.get_axis(i)) for i in range(numAxes)]
+            # print (jsInputs)
+            jsButtons = [float(self._joystick.get_button(i)) for i in
+                        range(self._joystick.get_numbuttons())]
+
+            # Custom function to map range of inputs [1, -1] to outputs [0, 1] i.e 1 from inputs means nothing is pressed
+            # For the steering, it seems fine as it is
+            K1 = 1.0  # 0.55
+            steerCmd = K1 * math.tan(1.1 * jsInputs[self._steer_idx])
+
+            K2 = 1.6  # 1.6
+            throttleCmd = K2 + (2.05 * math.log10(
+                -0.7 * jsInputs[self._throttle_idx] + 1.4) - 1.2) / 0.92
+            if throttleCmd <= 0:
+                throttleCmd = 0
+            elif throttleCmd > 1:
+                throttleCmd = 1
+
+            brakeCmd = 1.6 + (2.05 * math.log10(
+                -0.7 * jsInputs[self._brake_idx] + 1.4) - 1.2) / 0.92
+            if brakeCmd <= 0:
+                brakeCmd = 0
+            elif brakeCmd > 1:
+                brakeCmd = 1
+
+            self._control.steer = steerCmd
+            self._control.brake = brakeCmd
+            self._control.throttle = throttleCmd
+
+            #toggle = jsButtons[self._reverse_idx]
+
+            self._control.hand_brake = bool(jsButtons[self._handbrake_idx])
 
     # A reset function for reseting our environment.
     def reset(self):
 
         try:
-            
+
             if len(self.actor_list) != 0 or len(self.sensor_list) != 0:
                 self.client.apply_batch([carla.command.DestroyActor(x) for x in self.sensor_list])
                 self.client.apply_batch([carla.command.DestroyActor(x) for x in self.actor_list])
@@ -54,6 +118,9 @@ class CarlaEnvironment():
                 self.actor_list.clear()
             self.remove_sensors()
 
+            reset_to_zero = [0,0,0]
+            data_string = ','.join(map(str, reset_to_zero)) + '\n'
+            self.arduino.write(data_string.encode())
 
             # Blueprint of our main vehicle
             vehicle_bp = self.get_vehicle(CAR_NAME)
@@ -71,8 +138,8 @@ class CarlaEnvironment():
             self.vehicle = self.world.try_spawn_actor(vehicle_bp, transform)
             self.actor_list.append(self.vehicle)
 
-
             # Camera Sensor
+            ''' Will replace this with webcam image in later trials?'''
             self.camera_obj = CameraSensor(self.vehicle)
             while(len(self.camera_obj.front_camera) == 0):
                 time.sleep(0.0001)
@@ -153,6 +220,8 @@ class CarlaEnvironment():
             self.sensor_list.clear()
             self.actor_list.clear()
             self.remove_sensors()
+            if self.DIL:
+                self.close_COM()
             if self.display_on:
                 pygame.quit()
 
@@ -178,7 +247,22 @@ class CarlaEnvironment():
                 steer = max(min(steer, 1.0), -1.0)
                 throttle = float((action_idx[1] + 1.0)/2)
                 throttle = max(min(throttle, 1.0), 0.0)
-                self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
+
+                ''' THIS IS WHERE THINGS GET HAIRY'''
+                    # May need to add logic to stop jitter?
+                if self.DIL:
+                    steer_cmd = int(max(min(steer, 1.0), -1.0) * self.SWMaxDisplacement)
+                    throttle_cmd = int(max(min(throttle, 1.0), 0.0) * self.APPMaxDisplacement)
+                    data = [throttle_cmd,0,steer_cmd]
+                    data_string = ','.join(map(str, data))
+                    self.arduino.write(data_string.encode())
+                    self._parse_vehicle_wheel()
+                    self.vehicle.apply_control(self._control)
+
+                    
+                else:
+                    self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
+               
                 self.previous_steer = steer
                 self.throttle = throttle
             else:
@@ -464,6 +548,16 @@ class CarlaEnvironment():
                 blueprint.get_attribute('color').recommended_values)
             blueprint.set_attribute('color', color)
         return blueprint
+    
+    def get_player(self,vehicle_name):
+        blueprint = self.blueprint_library.filter(vehicle_name)[0]
+        blueprint.set_attribute('role_name', 'hero')
+        if blueprint.has_attribute('color'):
+            color = random.choice(
+                blueprint.get_attribute('color').recommended_values)
+            blueprint.set_attribute('color', color)
+        return blueprint
+
 
 
     # Spawn the vehicle in the environment
@@ -482,4 +576,7 @@ class CarlaEnvironment():
         self.front_camera = None
         self.collision_history = None
         self.wrong_maneuver = None
+    
+    def close_COM(self):
+        self.arduino.close()
 

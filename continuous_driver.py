@@ -33,6 +33,7 @@ def parse_args():
     parser.add_argument('--load-checkpoint', type=bool, default=MODEL_LOAD, help='resume training?')
     parser.add_argument('--torch-deterministic', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, `torch.backends.cudnn.deterministic=False`')
     parser.add_argument('--cuda', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, cuda will not be enabled by deafult')
+    parser.add_argument('--DIL', type=bool, default=False, help= 'Use Steering Wheel and Pedals?')
     args = parser.parse_args()
     
     return args
@@ -110,9 +111,11 @@ def runner():
         logging.error("Connection has been refused by the server.")
         ConnectionRefusedError
     if train:
-        env = CarlaEnvironment(client, world,town)
+        env = CarlaEnvironment(client, world, town, args.DIL)
     else:
-        env = CarlaEnvironment(client, world,town, checkpoint_frequency=None)
+        if args.DIL:
+            env = CarlaEnvironment(client, world, town, args.DIL, checkpoint_frequency=None)
+        env = CarlaEnvironment(client, world, town, args.DIL ,checkpoint_frequency=None)
     encode = EncodeState(LATENT_DIM)
 
 
