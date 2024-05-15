@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="changes savepath for sensor images and updates sensor locations to higher z values">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EgoGen_DataCollection.py" beforeDir="false" afterPath="$PROJECT_DIR$/EgoGen_DataCollection.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Hunter White hrwhite@crimson.ua.edu &lt;hrwhite@crimson.ua.edu&gt;" />
+        <option value="Hunter White" />
+      </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;hrwhite21&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="78ea551d-d4d4-499d-9195-570765e9bccb" />
+        <option name="url" value="https://github.com/hrwhite21/RL_CARLA_ADAS.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2eshgZk9xfozOLGM1UfMOSscjV9" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.EgoGen_DataCollection.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/data/HunterWhite/CARLA_Hunter&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-0509580d9d50-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.14494.241" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c69b28a7-9f66-4e3e-9335-18f4b55fa6d7" name="Changes" comment="" />
+      <created>1712699305201</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1712699305201</updated>
+    </task>
+    <task id="LOCAL-00001" summary="init">
+      <option name="closed" value="true" />
+      <created>1712700580865</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1712700580865</updated>
+    </task>
+    <task id="LOCAL-00002" summary="init">
+      <option name="closed" value="true" />
+      <created>1712700746872</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1712700746872</updated>
+    </task>
+    <task id="LOCAL-00003" summary="init">
+      <option name="closed" value="true" />
+      <created>1712700764027</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1712700764027</updated>
+    </task>
+    <task id="LOCAL-00004" summary="init scripts for Ego Vehicle generation and data collection from sensors">
+      <option name="closed" value="true" />
+      <created>1712701411634</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1712701411634</updated>
+    </task>
+    <task id="LOCAL-00005" summary="linted to follow PEP8">
+      <option name="closed" value="true" />
+      <created>1712789118705</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1712789118705</updated>
+    </task>
+    <task id="LOCAL-00006" summary="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers">
+      <option name="closed" value="true" />
+      <created>1712789462329</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1712789462329</updated>
+    </task>
+    <task id="LOCAL-00007" summary="many bugs in Data Collection script - working through them">
+      <option name="closed" value="true" />
+      <created>1712790578375</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1712790578375</updated>
+    </task>
+    <task id="LOCAL-00008" summary="worked through a few issues with syntax and assigning values properly ~NOTE~ TOWN03_Opt has an issue with the traffic manager that crashes the script. Have not found why.">
+      <option name="closed" value="true" />
+      <created>1712875439528</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1712875439528</updated>
+    </task>
+    <task id="LOCAL-00009" summary="changes savepath for sensor images and updates sensor locations to higher z values">
+      <option name="closed" value="true" />
+      <created>1713297844779</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1713297844779</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init" />
+    <MESSAGE value="init scripts for Ego Vehicle generation and data collection from sensors" />
+    <MESSAGE value="linted to follow PEP8" />
+    <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)" />
+    <MESSAGE value="adds files from Carla v0.9.15 install that contain useful code snippets for later projects (connecting vehicle commands to hardware simulator, adding dynamic weather to data collection, visualizing waypoints in real-time, showing detections in real-time, etc.)&#10;Included TODOs are from original Carla developers" />
+    <MESSAGE value="many bugs in Data Collection script - working through them" />
+    <MESSAGE value="worked through a few issues with syntax and assigning values properly ~NOTE~ TOWN03_Opt has an issue with the traffic manager that crashes the script. Have not found why." />
+    <MESSAGE value="changes savepath for sensor images and updates sensor locations to higher z values" />
+    <option name="LAST_COMMIT_MESSAGE" value="changes savepath for sensor images and updates sensor locations to higher z values" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>77</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/EgoGen_DataCollection.py</url>
+          <line>172</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
