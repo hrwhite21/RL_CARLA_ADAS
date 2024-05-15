@@ -1,4 +1,5 @@
 import carla
+import carla.command
 import numpy as np
 import os
 import platform
@@ -6,7 +7,8 @@ import random
 import glob
 import sys
 from datetime import datetime
-
+from copyof_PythonAPI_for_reference.carla.agents.navigation import global_route_planner
+from carla.command import DestroyActor
 try:
     sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
         sys.version_info.major,
@@ -18,14 +20,14 @@ cc = carla.ColorConverter.CityScapesPalette
 current_datetime = datetime.now().strftime('%Y_%m_%d')
 hrs_mins = datetime.now().strftime('%H_%M')
 def camera_callback(camera_data, save_path):
-    cam_save_path = f"{save_path}/rgb_cam_%06d.png"
+    cam_save_path = f"{save_path}/rgb_cam_%08d.png"
     camera_data.save_to_disk(cam_save_path % camera_data.frame)
 
     return
 
 
 def seg_camera_callback(semantic_segmentation_data, save_path):
-    seg_save_path = f"{save_path}/seg_cam_%06d.png"
+    seg_save_path = f"{save_path}/seg_cam_%08d.png"
     semantic_segmentation_data.save_to_disk(seg_save_path % semantic_segmentation_data.frame, cc)
     return
 
@@ -85,7 +87,7 @@ except:
 spawn_points = world.get_map().get_spawn_points()
 
 ego_bp = blueprint_library.find('vehicle.mini.cooper_s_2021')
-ego_bp.set_attribute('role_name', 'ego')
+ego_bp.set_attribute('role_name', 'hero')
 ego_color = random.choice(ego_bp.get_attribute('color').recommended_values)
 ego_bp.set_attribute('color', ego_color)
 ego_transform = random.choice(spawn_points)
@@ -151,7 +153,7 @@ for vehicle in world.get_blueprint_library().filter('*vehicle*'):
         blueprints.append(vehicle)
 
 # Set a max number of vehicles and prepare a list for those we spawn
-max_vehicles = 20
+max_vehicles = 45
 max_vehicles = min([max_vehicles, len(spawn_points)])
 vehicles = []
 
@@ -160,18 +162,22 @@ for i, spawn_point in enumerate(random.sample(spawn_points, max_vehicles)):
     temp = world.try_spawn_actor(random.choice(blueprints), spawn_point)
     if temp is not None:
         vehicles.append(temp)
-    for vehicle in vehicles:
-        vehicle.set_autopilot(True)
+    # for vehicle in vehicles:
+        temp.set_autopilot(True)#  vehicle.set_autopilot(True)
 print('\n World Set to AutoPilot!')
 ego_vehicle.set_autopilot(True)
 
 try:
-   client.start_recorder("/data/HunterWhite/CARLA_Hunter/Recordings/2024_04_16/logs/testlog123.log") #    client.start_recorder((logs_save_path + f"{hrs_mins}.log"), True)
+   client.start_recorder("/data/HunterWhite/CARLA_Hunter/Recordings/2024_04_16/logs/testlog123.log")
+   # This could probably be used to make training data super consistent, but may still need regular images?
+    #    client.start_recorder((logs_save_path + f"{hrs_mins}.log"), True)
     ### /home/yoon/.config/Epic/CarlaUE4/Saved/ Saves to here!
    ### Looks like this function call is super picky about the formatting of the save path.
    ### Good to know, but need to find a modular workaround?
+   ego_velocities = []
    while True:
        world.tick()
+       ego_velocities.append(ego_vehicle.get_velocity())
         # Rest of Code to capture images
 
 # Can probably modify this to use the apply in abtch stuff from the docs
@@ -180,16 +186,18 @@ except KeyboardInterrupt:
     print('\n Data Collection Terminated, destroying actors and reloading world')
     client.stop_recorder()
     active_sensors = world.get_actors().filter('sensor.*')
+    # batch = []
     for sensor in active_sensors:
         if sensor.is_listening():
             sensor.stop()
-        sensor.destroy()
-
+        # batch.append(sensor.destroy())
+    results = client.apply_batch_sync(carla.command.DestroyActor(sensor) for sensor in active_sensors)
+    # batch = []
     # Destroy vehicles
     active_vehicles = world.get_actors().filter('vehicle.*')
-    for vehicle in active_vehicles:
-        vehicle.destroy()
-
+    # for vehicle in active_vehicles:
+    #     batch.append(vehicle.destroy())
+    results = client.apply_batch_sync(carla.command.DestroyActor(vehicle) for vehicle in active_vehicles)
 finally:
     if world.get_actors().filter('sensor.*') or world.get_actors().filter('vehicle.*') is not None:
         print('\n The following actors were not destroyed. Please manually delete them.\n')
