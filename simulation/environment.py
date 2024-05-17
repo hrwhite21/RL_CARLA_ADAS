@@ -44,7 +44,7 @@ class CarlaEnvironment():
         # Established Serial Connection to arduino if DIL is enabled
         self.DIL = DIL
         if DIL:
-            self.arduino = serial.Serial('COM8',19200,timeout=10,write_timeout=0)
+            self.arduino = serial.Serial('COM7',19200,timeout=10,write_timeout=0)
             self.APPMaxDisplacement = 690
             self.BPPMaxDisplacement = 660
             self.SWMaxDisplacement = 2750
@@ -61,13 +61,13 @@ class CarlaEnvironment():
             self._parser = ConfigParser()
             self._parser.read('wheel_config.ini')
             self._steer_idx = int(
-                self._parser.get('G29 Racing Wheel', 'steering_wheel'))
+                self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'steering_wheel'))
             self._throttle_idx = int(
-                self._parser.get('G29 Racing Wheel', 'throttle'))
-            self._brake_idx = int(self._parser.get('G29 Racing Wheel', 'brake'))
-            self._reverse_idx = int(self._parser.get('G29 Racing Wheel', 'reverse'))
+                self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'throttle'))
+            self._brake_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'brake'))
+            self._reverse_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'reverse'))
             self._handbrake_idx = int(
-                self._parser.get('G29 Racing Wheel', 'handbrake'))
+                self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'handbrake'))
             self._control = carla.VehicleControl()
             
 

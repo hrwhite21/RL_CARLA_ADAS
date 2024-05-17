@@ -1,9 +1,14 @@
 import serial
 import numpy
+import numpy as np
+import random
 done = False
-arduino = serial.Serial("COM7",115200,timeout=10)
+arduino = serial.Serial("COM7",19200,timeout=10)
 
 while not done:
-    numbers = input('Input a set of numbers less than 600 in the form [xyz,xyz,xyz]')
+    numbers = np.random.randint(0,400,3)
+    print(numbers)
     data_string = ','.join(map(str, numbers)) + '\n'
+    print(data_string)
     arduino.write(data_string.encode())
+    print(arduino.readline())
