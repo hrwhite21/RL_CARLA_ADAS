@@ -45,9 +45,9 @@ class CarlaEnvironment():
         self.DIL = DIL
         if DIL:
             self.arduino = serial.Serial('COM7',19200,timeout=10,write_timeout=0)
-            self.APPMaxDisplacement = 690
-            self.BPPMaxDisplacement = 660
-            self.SWMaxDisplacement = 2750
+            self.APPMaxDisplacement = 690/2
+            self.BPPMaxDisplacement = 660/2
+            self.SWMaxDisplacement = 2750/2
                     # initialize steering wheel
             pygame.joystick.init()
 
@@ -74,6 +74,7 @@ class CarlaEnvironment():
     def _parse_vehicle_wheel(self):
             numAxes = self._joystick.get_numaxes()
             jsInputs = [float(self._joystick.get_axis(i)) for i in range(numAxes)]
+            print(jsInputs)
             # print (jsInputs)
             jsButtons = [float(self._joystick.get_button(i)) for i in
                         range(self._joystick.get_numbuttons())]
@@ -82,7 +83,7 @@ class CarlaEnvironment():
             # For the steering, it seems fine as it is
             K1 = 1.0  # 0.55
             steerCmd = K1 * math.tan(1.1 * jsInputs[self._steer_idx])
-
+            print('STEER CMD:',steerCmd)
             K2 = 1.6  # 1.6
             throttleCmd = K2 + (2.05 * math.log10(
                 -0.7 * jsInputs[self._throttle_idx] + 1.4) - 1.2) / 0.92
@@ -90,6 +91,7 @@ class CarlaEnvironment():
                 throttleCmd = 0
             elif throttleCmd > 1:
                 throttleCmd = 1
+            print('THRTL CMD:',throttleCmd)
 
             brakeCmd = 1.6 + (2.05 * math.log10(
                 -0.7 * jsInputs[self._brake_idx] + 1.4) - 1.2) / 0.92
@@ -103,7 +105,6 @@ class CarlaEnvironment():
             self._control.throttle = throttleCmd
 
             #toggle = jsButtons[self._reverse_idx]
-
             self._control.hand_brake = bool(jsButtons[self._handbrake_idx])
 
     # A reset function for reseting our environment.
@@ -254,18 +255,27 @@ class CarlaEnvironment():
                 if self.DIL == True:
                     steer_cmd = int(max(min(steer, 1.0), -1.0) * self.SWMaxDisplacement)
                     throttle_cmd = int(max(min(throttle, 1.0), 0.0) * self.APPMaxDisplacement)
-                    data = [throttle_cmd,0,steer_cmd]
-                    data_string = ','.join(map(str, data))
-                    self.arduino.write(data_string.encode())
+                    if abs(steer - self.previous_steer) >=0.02 or abs(throttle-self.throttle) > 0.02:
+                        data = [throttle_cmd,0,steer_cmd]
+                        data_string = ','.join(map(str, data)) + '\n'
+                        self.arduino.write(data_string.encode())
+                        self.previous_steer = steer
+                        self.throttle = throttle
+                        time.sleep(0.05)
+
+                    self.arduino.reset_input_buffer()
+                    print(self.arduino.readline())
                     self._parse_vehicle_wheel()
-                    self.vehicle.apply_control(self._control)
+                    print(self._parse_vehicle_wheel())                    
+                    # V Not Sure i need this V
+                    #self.vehicle.apply_control(self._control)
+
 
                     
                 else:
                     self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
-               
-                self.previous_steer = steer
-                self.throttle = throttle
+                    self.previous_steer = steer
+                    self.throttle = throttle
             else:
                 steer = self.action_space[action_idx]
                 if self.velocity < 20.0:
