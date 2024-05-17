@@ -12,7 +12,7 @@ class CarlaEnvironment():
 
     def __init__(self, client, world, town, DIL, checkpoint_frequency=100, continuous_action=True, ) -> None:
 
-
+        pygame.init()
         self.client = client
         self.world = world
         self.blueprint_library = self.world.get_blueprint_library()
@@ -49,14 +49,14 @@ class CarlaEnvironment():
             self.BPPMaxDisplacement = 660/2
             self.SWMaxDisplacement = 2750/2
                     # initialize steering wheel
-            pygame.joystick.init()
 
             joystick_count = pygame.joystick.get_count()
             if joystick_count > 1:
                 raise ValueError("Please Connect Just One Joystick")
-
-            self._joystick = pygame.joystick.Joystick(0)
+            
             self._joystick.init()
+            self._joystick = pygame.joystick.Joystick(0)
+
 
             self._parser = ConfigParser()
             self._parser.read('wheel_config.ini')
@@ -73,9 +73,10 @@ class CarlaEnvironment():
 
     def _parse_vehicle_wheel(self):
             numAxes = self._joystick.get_numaxes()
-            jsInputs = [float(self._joystick.get_axis(i)) for i in range(numAxes)]
-
-            print(jsInputs)
+            for i in range(numAxes):
+                axis = joystick.get_axis(i)
+                print(axis)
+            
             # print (jsInputs)
             jsButtons = [float(self._joystick.get_button(i)) for i in
                         range(self._joystick.get_numbuttons())]
