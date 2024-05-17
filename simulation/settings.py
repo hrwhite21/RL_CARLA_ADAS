@@ -8,8 +8,8 @@ Names of the parameters are self-explanatory therefore elimating the use of furt
 '''
 
 
-HOST = "localhost"
-PORT = 2000
+HOST = 'localhost'
+PORT = 4321
 TIMEOUT = 10.0
 
 CAR_NAME = 'model3'

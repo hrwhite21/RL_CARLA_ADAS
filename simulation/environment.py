@@ -118,9 +118,10 @@ class CarlaEnvironment():
                 self.actor_list.clear()
             self.remove_sensors()
 
-            reset_to_zero = [0,0,0]
-            data_string = ','.join(map(str, reset_to_zero)) + '\n'
-            self.arduino.write(data_string.encode())
+            if self.DIL == True:
+                reset_to_zero = [0,0,0]
+                data_string = ','.join(map(str, reset_to_zero)) + '\n'
+                self.arduino.write(data_string.encode())
 
             # Blueprint of our main vehicle
             vehicle_bp = self.get_vehicle(CAR_NAME)
@@ -220,7 +221,7 @@ class CarlaEnvironment():
             self.sensor_list.clear()
             self.actor_list.clear()
             self.remove_sensors()
-            if self.DIL:
+            if self.DIL == True:
                 self.close_COM()
             if self.display_on:
                 pygame.quit()
@@ -250,7 +251,7 @@ class CarlaEnvironment():
 
                 ''' THIS IS WHERE THINGS GET HAIRY'''
                     # May need to add logic to stop jitter?
-                if self.DIL:
+                if self.DIL == True:
                     steer_cmd = int(max(min(steer, 1.0), -1.0) * self.SWMaxDisplacement)
                     throttle_cmd = int(max(min(throttle, 1.0), 0.0) * self.APPMaxDisplacement)
                     data = [throttle_cmd,0,steer_cmd]
