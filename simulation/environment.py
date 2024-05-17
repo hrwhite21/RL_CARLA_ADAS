@@ -74,6 +74,7 @@ class CarlaEnvironment():
     def _parse_vehicle_wheel(self):
             numAxes = self._joystick.get_numaxes()
             jsInputs = [float(self._joystick.get_axis(i)) for i in range(numAxes)]
+
             print(jsInputs)
             # print (jsInputs)
             jsButtons = [float(self._joystick.get_button(i)) for i in
@@ -123,6 +124,7 @@ class CarlaEnvironment():
                 reset_to_zero = [0,0,0]
                 data_string = ','.join(map(str, reset_to_zero)) + '\n'
                 self.arduino.write(data_string.encode())
+                time.sleep(0.10)
 
             # Blueprint of our main vehicle
             vehicle_bp = self.get_vehicle(CAR_NAME)
