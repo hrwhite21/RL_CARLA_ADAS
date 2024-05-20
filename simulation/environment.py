@@ -13,13 +13,14 @@ class CarlaEnvironment():
     def __init__(self, client, world, town, DIL, checkpoint_frequency=100, continuous_action=True, ) -> None:
 
         pygame.init()
+
         self.client = client
         self.world = world
         self.blueprint_library = self.world.get_blueprint_library()
         self.map = self.world.get_map()
         self.action_space = self.get_discrete_action_space()
         self.continous_action_space = continuous_action
-        self.display_on = VISUAL_DISPLAY
+        self.display_on = False #VISUAL_DISPLAY
         self.vehicle = None
         self.settings = None
         self.current_waypoint_index = 0
@@ -44,71 +45,13 @@ class CarlaEnvironment():
         # Established Serial Connection to arduino if DIL is enabled
         self.DIL = DIL
         if DIL:
-            self.arduino = serial.Serial('COM7',19200,timeout=10,write_timeout=0)
+            self.arduino = serial.Serial('COM7',115200,timeout=10,write_timeout=0)
             self.APPMaxDisplacement = 690/2
             self.BPPMaxDisplacement = 660/2
             self.SWMaxDisplacement = 2750/2
-                    # initialize steering wheel
-
-            joystick_count = pygame.joystick.get_count()
-            if joystick_count > 1:
-                raise ValueError("Please Connect Just One Joystick")
-            
-            self._joystick.init()
-            self._joystick = pygame.joystick.Joystick(0)
-
-
-            self._parser = ConfigParser()
-            self._parser.read('wheel_config.ini')
-            self._steer_idx = int(
-                self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'steering_wheel'))
-            self._throttle_idx = int(
-                self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'throttle'))
-            self._brake_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'brake'))
-            self._reverse_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'reverse'))
-            self._handbrake_idx = int(
-                self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'handbrake'))
-            self._control = carla.VehicleControl()
-            
-
-    def _parse_vehicle_wheel(self):
-            numAxes = self._joystick.get_numaxes()
-            for i in range(numAxes):
-                axis = joystick.get_axis(i)
-                print(axis)
-            
-            # print (jsInputs)
-            jsButtons = [float(self._joystick.get_button(i)) for i in
-                        range(self._joystick.get_numbuttons())]
-
-            # Custom function to map range of inputs [1, -1] to outputs [0, 1] i.e 1 from inputs means nothing is pressed
-            # For the steering, it seems fine as it is
-            K1 = 1.0  # 0.55
-            steerCmd = K1 * math.tan(1.1 * jsInputs[self._steer_idx])
-            print('STEER CMD:',steerCmd)
-            K2 = 1.6  # 1.6
-            throttleCmd = K2 + (2.05 * math.log10(
-                -0.7 * jsInputs[self._throttle_idx] + 1.4) - 1.2) / 0.92
-            if throttleCmd <= 0:
-                throttleCmd = 0
-            elif throttleCmd > 1:
-                throttleCmd = 1
-            print('THRTL CMD:',throttleCmd)
-
-            brakeCmd = 1.6 + (2.05 * math.log10(
-                -0.7 * jsInputs[self._brake_idx] + 1.4) - 1.2) / 0.92
-            if brakeCmd <= 0:
-                brakeCmd = 0
-            elif brakeCmd > 1:
-                brakeCmd = 1
-
-            self._control.steer = steerCmd
-            self._control.brake = brakeCmd
-            self._control.throttle = throttleCmd
-
-            #toggle = jsButtons[self._reverse_idx]
-            self._control.hand_brake = bool(jsButtons[self._handbrake_idx])
-
+            # self.controller = DualControl(world)
+            clock = pygame.time.Clock()
+   
     # A reset function for reseting our environment.
     def reset(self):
 
@@ -119,13 +62,16 @@ class CarlaEnvironment():
                 self.client.apply_batch([carla.command.DestroyActor(x) for x in self.actor_list])
                 self.sensor_list.clear()
                 self.actor_list.clear()
+
             self.remove_sensors()
 
             if self.DIL == True:
                 reset_to_zero = [0,0,0]
                 data_string = ','.join(map(str, reset_to_zero)) + '\n'
                 self.arduino.write(data_string.encode())
-                time.sleep(0.10)
+                time.sleep(0.5)
+                # self.controller.parse_events()
+
 
             # Blueprint of our main vehicle
             vehicle_bp = self.get_vehicle(CAR_NAME)
@@ -142,7 +88,7 @@ class CarlaEnvironment():
 
             self.vehicle = self.world.try_spawn_actor(vehicle_bp, transform)
             self.actor_list.append(self.vehicle)
-
+            self.controller = DualControl(self.vehicle)
             # Camera Sensor
             ''' Will replace this with webcam image in later trials?'''
             self.camera_obj = CameraSensor(self.vehicle)
@@ -234,7 +180,6 @@ class CarlaEnvironment():
 # ----------------------------------------------------------------
 # Step method is used for implementing actions taken by our agent|
 # ----------------------------------------------------------------
-
     # A step function is used for taking inputs generated by neural net.
     def step(self, action_idx):
         try:
@@ -256,37 +201,26 @@ class CarlaEnvironment():
                 ''' THIS IS WHERE THINGS GET HAIRY'''
                     # May need to add logic to stop jitter?
                 if self.DIL == True:
-                    steer_cmd = int(max(min(steer, 1.0), -1.0) * self.SWMaxDisplacement)
-                    throttle_cmd = int(max(min(throttle, 1.0), 0.0) * self.APPMaxDisplacement)
-                    if abs(steer - self.previous_steer) >=0.02 or abs(throttle-self.throttle) > 0.02:
-                        data = [throttle_cmd,0,steer_cmd]
-                        data_string = ','.join(map(str, data)) + '\n'
-                        self.arduino.write(data_string.encode())
-                        self.previous_steer = steer
-                        self.throttle = throttle
-                        time.sleep(0.05)
-
-                    self.arduino.reset_input_buffer()
-                    print(self.arduino.readline())
-                    self._parse_vehicle_wheel()
-                    print(self._parse_vehicle_wheel())                    
-                    # V Not Sure i need this V
-                    #self.vehicle.apply_control(self._control)
-
-
                     
+                    steer_cmd = int((0.9 * self.previous_steer + 0.1 * steer) * self.SWMaxDisplacement)
+                    throttle_cmd = int((0.9 * self.throttle + 0.1 * throttle) * self.APPMaxDisplacement)
+                    data = [throttle_cmd,0,steer_cmd]
+                    data_string = ','.join(map(str, data)) + '\n'
+                    self.arduino.write(data_string.encode())
+                    self.previous_steer = steer
+                    self.throttle = throttle
+
+                    time.sleep(0.05)
+
+                    self.controller.parse_events()
+                    self.arduino.reset_input_buffer()
+                    
+                    print(self.arduino.readline().decode())
+
                 else:
                     self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
                     self.previous_steer = steer
                     self.throttle = throttle
-            else:
-                steer = self.action_space[action_idx]
-                if self.velocity < 20.0:
-                    self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=1.0))
-                else:
-                    self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1))
-                self.previous_steer = steer
-                self.throttle = 1.0
             
             # Traffic Light state
             if self.vehicle.is_at_traffic_light():
@@ -563,14 +497,14 @@ class CarlaEnvironment():
             blueprint.set_attribute('color', color)
         return blueprint
     
-    def get_player(self,vehicle_name):
-        blueprint = self.blueprint_library.filter(vehicle_name)[0]
-        blueprint.set_attribute('role_name', 'hero')
-        if blueprint.has_attribute('color'):
-            color = random.choice(
-                blueprint.get_attribute('color').recommended_values)
-            blueprint.set_attribute('color', color)
-        return blueprint
+    # def get_player(self,vehicle_name):
+    #     blueprint = self.blueprint_library.filter(vehicle_name)[0]
+    #     blueprint.set_attribute('role_name', 'hero')
+    #     if blueprint.has_attribute('color'):
+    #         color = random.choice(
+    #             blueprint.get_attribute('color').recommended_values)
+    #         blueprint.set_attribute('color', color)
+    #     return blueprint
 
 
 
@@ -594,3 +528,87 @@ class CarlaEnvironment():
     def close_COM(self):
         self.arduino.close()
 
+
+
+# ==============================================================================
+# -- DualControl -----------------------------------------------------------
+# ==============================================================================
+
+
+class DualControl(object):
+    def __init__(self, veh_to_control):
+        
+        if isinstance(veh_to_control, carla.Vehicle):
+            self._control = carla.VehicleControl()
+        else:
+            raise NotImplementedError("Actor type not supported")
+        self._steer_cache = 0.0
+
+        # initialize steering wheel
+        pygame.joystick.init()
+
+        joystick_count = pygame.joystick.get_count()
+        if joystick_count > 1:
+            raise ValueError("Please Connect Just One Joystick")
+
+        self._joystick = pygame.joystick.Joystick(0)
+        self._joystick.init()
+
+        self._parser = ConfigParser()
+        self._parser.read('wheel_config.ini')
+        self._steer_idx = int(
+            self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'steering_wheel'))
+        self._throttle_idx = int(
+            self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'throttle'))
+        self._brake_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'brake'))
+        self._reverse_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'reverse'))
+        self._handbrake_idx = int(
+            self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'handbrake'))
+
+    def parse_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            
+            elif event.type == pygame.JOYAXISMOTION and event.__dict__['axis'] != 2:
+                if isinstance(self._control, carla.VehicleControl):
+                    # self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
+                    self._parse_vehicle_wheel()
+                    # self._control.reverse = self._control.gear < 0
+            else:
+                pass
+
+    def _parse_vehicle_wheel(self):
+        numAxes = self._joystick.get_numaxes()
+        jsInputs = [float(self._joystick.get_axis(i)) for i in range(numAxes)]
+        # print (jsInputs)
+        jsButtons = [float(self._joystick.get_button(i)) for i in
+                     range(self._joystick.get_numbuttons())]
+
+        # Custom function to map range of inputs [1, -1] to outputs [0, 1] i.e 1 from inputs means nothing is pressed
+        # For the steering, it seems fine as it is
+        K1 = 1.0  # 0.55
+        steerCmd = K1 * math.tan(1.1 * jsInputs[self._steer_idx])
+
+        K2 = 1.6  # 1.6
+        throttleCmd = K2 + (2.05 * math.log10(
+            -0.7 * jsInputs[self._throttle_idx] + 1.4) - 1.2) / 0.92
+        if throttleCmd <= 0:
+            throttleCmd = 0
+        elif throttleCmd > 1:
+            throttleCmd = 1
+
+        brakeCmd = 1.6 + (2.05 * math.log10(
+            -0.7 * jsInputs[self._brake_idx] + 1.4) - 1.2) / 0.92
+        if brakeCmd <= 0:
+            brakeCmd = 0
+        elif brakeCmd > 1:
+            brakeCmd = 1
+
+        self._control.steer = steerCmd
+        self._control.brake = brakeCmd
+        self._control.throttle = throttleCmd
+
+        #toggle = jsButtons[self._reverse_idx]
+
+        self._control.hand_brake = bool(jsButtons[self._handbrake_idx])

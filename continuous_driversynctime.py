@@ -15,8 +15,8 @@ from networks.on_policy.ppo.agent import PPOAgent
 from simulation.connection import ClientConnection
 from simulation.environment import CarlaEnvironment
 from parameters import *
-from pygame import time as pgtime
-clock = pgtime.Clock()
+
+
 def parse_args():
     
     parser = argparse.ArgumentParser()
@@ -111,9 +111,9 @@ def runner():
         logging.error("Connection has been refused by the server.")
         ConnectionRefusedError
     if train:
-        env = CarlaEnvironment(client, world, town, args.DIL)
+        env = CarlaEnvironment(client, world, town, args.DIL, sync_mode=True)
     else:
-        env = CarlaEnvironment(client, world, town, args.DIL ,checkpoint_frequency=None)
+        env = CarlaEnvironment(client, world, town, args.DIL, sync_mode=True, checkpoint_frequency=None)
     encode = EncodeState(LATENT_DIM)
 
 
@@ -157,7 +157,7 @@ def runner():
                     # select action with policy
                     action = agent.get_action(observation, train=True)
 
-                    observastion, reward, done, info = env.step(action)
+                    observation, reward, done, info = env.sync_step(action)
                     if observation is None:
                         break
                     observation = encode.process(observation)
@@ -246,7 +246,6 @@ def runner():
                 current_ep_reward = 0
                 t1 = datetime.now()
                 for t in range(args.episode_length):
-                    clock.tick_busy_loop(60)
                     # select action with policy
                     action = agent.get_action(observation, train=False)
                     observation, reward, done, info = env.step(action)
