@@ -5,7 +5,9 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{tikz}
-
+\usepackage{amsmath}
+\usepackage{}
+\graphicspath{{C:/Users/hunte/Autonomous-Driving-in-Carla-using-Deep-Reinforcement-Learning-main/TexDocs/Pictures_and_Figures}{
 \title{CARLA Leave-Over Documentation}
 \author{Hunter White}
 \date{April 2024}
@@ -17,25 +19,67 @@
 \section{Overview}
 \label{sec:Overview}
 This document is intended to serve as a resource for getting started with the "open-source driving simulator for autonomous driving research" known as Car Learning to Act \href{https://carla.org/}{CARLA}. It includes a description of CARLA, the steps taken to install and configure CARLA on both lab computers, and the scripts, terminal commands, and workflow for interacting with CARLA that may be useful. A significant effort is made to include solutions to errors that may be encountered during the installation and initialization processes, as well as links to StackOverflow/Linux Forums/CARLA Documentation pages that proved useful in the troubleshooting and error correction processes.
+\section{Creating the Simulation Environment}
 
-\section{Environment setup and package installation}
-\subsection{Package and Environment Managers}
+\subsection{Environment setup and package installation}
+\subsubsection{Package and Environment Managers}
+\label{subsec: Environment Managers}
+\textbf{Definitely Review For Consistency}\\
 \href{https://www.anaconda.com/}{Anaconda} is used as the package and environment manager. \href{https://www.anaconda.com/products/navigator}{Anaconda Navigator} vastly simplifies the package and environment management problem by providing a relatively simple, if a little bloated, graphical user interface for managing virtual environments, with shortcuts to launch common programs with the conda environment activated. This proved especially useful when initially exploring the best (read: easiest to integrate with existing machine learning research on GitHub) version of python and CARLA to work with. Most packages can be installed via conda or pip, although some require one or the other. A short comparison between conda and pip is given \href{https://www.anaconda.com/blog/understanding-conda-and-pip}{on the conda blog} Special care should be taken to install all possible packages with one installer and then the other if necessary, as conda does not communicate with pip and vice-versa. % Should probably find a better way to word this. 
 A getting started guide for conda is available \href{https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html}{here}.
 When installing packages with conda, it will be useful to add the conda-forge channel. A guide on how to do that is provided \href{https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/channels.html}{here}.
 Note: Occasionally, updating conda before installing all desired packages will result in a deadlocked environment. Unfortunately, the only way to fix the environment is to delete it and reinstall all desired packages in a new environment. Generally, I never updated conda unless I was about to create a new environment or start a new project.
 \\
-\subsection{Required Packages}
+\subsubsection{Required Packages}
+\label{subsec:Requirements}
+\textbf{Be sure to update pip and conda before creating a new environment and downloading packages for CARLA or the provided code.} \\
+To run the provided code, the following packages and python version are/is necessary:
+\begin{table}[h]
+\centering
+ \begin{tabular}{| c | c | c |}
+ \hline
+ Package & Version & requirements filepath \\
+ \hline 
+CARLA & 0.9.8 & N/A \\
+ Python & 3.7.* & N/A \\
+ numpy & 1.21.1 & (your-carla-filespath)/carla/PythonAPI/examples \\
+ pygame & 2.1.2 & (your-carla-filespath)/carla/PythonAPI/examples \\
+ matplotlib & * & (your-carla-filespath)/carla/PythonAPI/examples \\
+ open3d & * & (your-carla-filespath)/carla/PythonAPI/examples \\
+ pillow & 9.4.0 & (your-carla-filespath)/carla/PythonAPI/examples \\
+ future & 0.18.3 & (your-carla-filespath)/carla/PythonAPI/examples \\
+ networkx & * & (your-carla-filespath)/carla/PythonAPI/carla \\
+ distro & * & (your-carla-filespath)/carla/PythonAPI/carla \\
+ Shapely & 1.7.* & (your-carla-filespath)/carla/PythonAPI/carla \\
+ psutil & * &  (your-carla-filespath)/carla/PythonAPI/util \\
+ py-cpuinfo & * & (your-carla-filespath)/carla/PythonAPI/util \\
+ python-tr & * & (your-carla-filespath)/carla/PythonAPI/util \\
+ poetry & 1.3.2 & (your-repository-path)/requirements.txt \\
+ \hline
+ \end{tabular}
+\caption{Required packages for CARLA, CARLA examples, and the provided code}
+\label{table:RequirementsTable}
+\end{table}
+
+\label{table: Required Packages to run the provided code and any CARLA-provided examples}
+To install all of the above packages, you have a few options:
 \begin{enumerate}
 \item(Option 1: Individually) All required packages can be installed by navigating to each \begin{verbatim} requirements.txt \end{verbatim} within the \href{https://github.com/hrwhite21/RL_CARLA_ADAS}{GitHub Repository} and running the command \begin{verbatim} pip install -r requirements.txt \end{verbatim} or \begin{verbatim}conda install --yes --file requirements.txt \end{verbatim} in the command prompt with the desired conda environment activated.
 \item(Option 2: Grouped) A single \begin{verbatim} requirements.txt \end{verbatim} file is provided for easier installation with pip. This is installed the same way as described in Option 1. Alternatively, the conda equivalent \begin{verbatim} <environment_name>.yml \end{verbatim} file is also provided. To install the \begin{verbatim} <environment_name>.yml \end{verbatim} file, use the command \begin{verbatim} conda env create -f <environment-name>.yml \end{verbatim} in the command prompt or terminal.
-\item(Note on Poetry) Poetry is included as an alternate package manager, and was used by \href{https://github.com/idreesshaikh}{Idrees Razak} when creating the PPO agent and variational autoencoder that I used as a foundation. Poetry's main function in the repository is to download the legacy versions of PyTorch and CUDA that were used to train the PPO agent and VAE. To install these with Poetry, navigate to the Poetry folder using the command prompt or powershell, then run the command \begin{verbatim} poetry update\end{verbatim}. As a disclaimer, I don't think this step is necessary if you would rather install the correct PyTorch and CUDA packages using pip or conda. The legacy versions can be found on the \href{}{PyTorch website}
-\end{enumerate}
+\item(Note on Poetry) Poetry is included as an alternate package manager, and was used by \href{https://github.com/idreesshaikh}{Idrees Razak} when creating the PPO agent and variational autoencoder that I used as a foundation. Poetry's main function in the repository is to download the legacy versions of PyTorch and CUDA that were used to train the PPO agent and VAE. To install these with Poetry, navigate to the Poetry folder using the command prompt or powershell, then run the command \begin{verbatim} poetry update \end{verbatim} As a disclaimer, I don't think this step is necessary if you would rather install the correct PyTorch and CUDA packages using pip or conda. The legacy versions can be found on the \href{https://pytorch.org/get-started/previous-versions/}{PyTorch website}
+\end{enumerate} 
 
 
 
-\section{How to Install CARLA}
+\section{How to Download and Install CARLA}
 \label{sec:CARLAInstall}
+\textbf{NOTE: CARLA requires a dedicated GPU for with at least 6GB of VRAM. This excludes most consumer laptops. More VRAM does not necessarily make CARLA run faster, but it does generally make CARLA more stable when adding large numbers of actors. CARLA also recommends having an addition GPU for any machine learning, although this is not necessary if your GPU has the capacity. (i.e. ~12 GB of VRAM and from a recent generation of Vulkan compatible GPUs)}
+CARLA is fairly easy to install, and the process is nearly identical for Windows and Linux (Ubuntu). Because we do not need the additional functionality gained by building CARLA from source, we can follow the \href{https://carla.readthedocs.io/en/latest/start_quickstart/}{quick getting started guide.} \textbf{NOTE: There are different versions of documentation that correspond to each released version of CARLA. Make sure you use the documentation version that corresponds to the CARLA version you intend to use.} Be sure to make sure that pip and/or conda are up to date before creating the environment. \\
+
+
+\section{Verifying CARLA installation}
+\label{sec:verifyInstall}
+CARLA provides a number of examples that are useful for checking that CARLA and its required packages were installed correctly. These provided examples are also useful for understanding the CARLA Python API, and give some ideas on how to structure code that will interact with CARLA. The \href{https://carla.readthedocs.io/en/latest/python_api/}{latest version of the Python API Reference} can be found here. 
 
 
 \end{document}
