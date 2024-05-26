@@ -7,7 +7,7 @@
 \usepackage{tikz}
 \usepackage{amsmath}
 \usepackage{}
-\graphicspath{{C:/Users/hunte/Autonomous-Driving-in-Carla-using-Deep-Reinforcement-Learning-main/TexDocs/Pictures_and_Figures}{
+
 \title{CARLA Leave-Over Documentation}
 \author{Hunter White}
 \date{April 2024}
@@ -62,14 +62,15 @@ CARLA & 0.9.8 & N/A \\
 \end{table}
 
 \label{table: Required Packages to run the provided code and any CARLA-provided examples}
-To install all of the above packages, you have a few options:
+To install all of the above packages, open your prefered command line interface (cmd or powershell for windows, terminal for linux), and activate your conda environment. You can then install the packages in either of the following ways:
+
 \begin{enumerate}
-\item(Option 1: Individually) All required packages can be installed by navigating to each \begin{verbatim} requirements.txt \end{verbatim} within the \href{https://github.com/hrwhite21/RL_CARLA_ADAS}{GitHub Repository} and running the command \begin{verbatim} pip install -r requirements.txt \end{verbatim} or \begin{verbatim}conda install --yes --file requirements.txt \end{verbatim} in the command prompt with the desired conda environment activated.
+\item(Option 1: Individually) All required packages can be installed by navigating to each \begin{verbatim} requirements.txt \end{verbatim} within your local copy of the \href{https://github.com/hrwhite21/RL_CARLA_ADAS}{GitHub Repository} and running the command \begin{verbatim} pip install -r requirements.txt \end{verbatim} or \begin{verbatim}conda install --yes --file requirements.txt \end{verbatim} in the command prompt with the desired conda environment activated.
 \item(Option 2: Grouped) A single \begin{verbatim} requirements.txt \end{verbatim} file is provided for easier installation with pip. This is installed the same way as described in Option 1. Alternatively, the conda equivalent \begin{verbatim} <environment_name>.yml \end{verbatim} file is also provided. To install the \begin{verbatim} <environment_name>.yml \end{verbatim} file, use the command \begin{verbatim} conda env create -f <environment-name>.yml \end{verbatim} in the command prompt or terminal.
 \item(Note on Poetry) Poetry is included as an alternate package manager, and was used by \href{https://github.com/idreesshaikh}{Idrees Razak} when creating the PPO agent and variational autoencoder that I used as a foundation. Poetry's main function in the repository is to download the legacy versions of PyTorch and CUDA that were used to train the PPO agent and VAE. To install these with Poetry, navigate to the Poetry folder using the command prompt or powershell, then run the command \begin{verbatim} poetry update \end{verbatim} As a disclaimer, I don't think this step is necessary if you would rather install the correct PyTorch and CUDA packages using pip or conda. The legacy versions can be found on the \href{https://pytorch.org/get-started/previous-versions/}{PyTorch website}
 \end{enumerate} 
 
-
+If you try option 2 and find that packages are missing, please try option 1.
 
 \section{How to Download and Install CARLA}
 \label{sec:CARLAInstall}
@@ -80,6 +81,24 @@ CARLA is fairly easy to install, and the process is nearly identical for Windows
 \section{Verifying CARLA installation}
 \label{sec:verifyInstall}
 CARLA provides a number of examples that are useful for checking that CARLA and its required packages were installed correctly. These provided examples are also useful for understanding the CARLA Python API, and give some ideas on how to structure code that will interact with CARLA. The \href{https://carla.readthedocs.io/en/latest/python_api/}{latest version of the Python API Reference} can be found here. 
+
+\subsection{Opening a CARLA server instance: Windows}
+\label{sec:CARLAserverwindows}
+To open a carla instance on Windows, first open the terminal by pressing "ctrl+x" and selecting terminal. Depending on your windows preferences and configuration, this will open either a powershell instance or a command promt instance. For our purposes, they are largely interchangeable, although powershell may be more familiar if you have previous experience. In your terminal, nvaigate to the CARLA folder by using the change directory function, abbreviated cd. 
+\\
+I have extracted CARLA to \begin{verbatim} C:\WindowsNoEditor \end{verbatim}.
+\\
+ \textbf{insert command line figure showing cd to carla directory.}
+If you are having trouble navigating to your CARLA directory, you can copy the path to your directory by finding the directory in file explorer and  right clicking on the "TOP MIDDLE WINDOW THINGY?" and selecting copy address as text. You can then paste the address into your terminal after the call to change directory.
+Alternatively, you can navigate through your files and directories by using a combination of ls, which lists the files and directories within the current directory, and cd. 
+
+To start an instance of CARLA after navigating to the CARLA directory, simply run the command \begin{verbatim} .\\CARLAUE4.exe \end{verbatim} in the terminal. A black window should pop up on the screen. After a few moments, the window should load to the default town for your version of CARLA. In CARLA 0.9.8, it should look like this:
+\\ 
+\textbf{Insert default carla window here for 0.9.8}
+
+You can use the WASDQE keys to navigate the spectator camera around the default map. There's not much to see, as we haven't loaded in vehicles, pedestrians, etc. (a.k.a. "Actors"), but this will give you a feel for how smoothly CARLA runs on your device.
+
+To add in some actors, we will need to open an additional terminal window, and make sure the conda environment is activated. The easiest way to do this is to install the powershell/command prompt shortcut in anaconda navigator, or by typing conda activaite <your CARLA environment name>. You will see the name of your environment in parenthesis in your terminal prompt if you have successfully activated your environment. Next, navigate to the Python API examples directory within your CARLA directory using the terminal window with your activated conda environment. the examples directory should have a path similar to \begin{verbatim}"<your_carla_directory>\\PythonAPI\\examples".  \end{verbatim}
 
 
 \end{document}
