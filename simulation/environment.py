@@ -45,10 +45,11 @@ class CarlaEnvironment():
         # Established Serial Connection to arduino if DIL is enabled
         self.DIL = DIL
         if DIL:
-            self.arduino = serial.Serial('COM4',115200,timeout=10,write_timeout=0)
-            self.APPMaxDisplacement = 690/2
-            self.BPPMaxDisplacement = 660/2
-            self.SWMaxDisplacement = 2750/2
+            # COM4 if at apartment and Elegoo, COM7 if Arduino and LAbPC COM8 if Elego and Lab
+            self.arduino = serial.Serial('COM7',9600,timeout=10,write_timeout=0)
+            self.APPMaxDisplacement = 690
+            self.BPPMaxDisplacement = 660
+            self.SWMaxDisplacement = 1100
             # self.controller = DualControl(world)
             clock = pygame.time.Clock()
    
@@ -205,17 +206,16 @@ class CarlaEnvironment():
                     steer_cmd = int((0.9 * self.previous_steer + 0.1 * steer) * self.SWMaxDisplacement)
                     throttle_cmd = int((0.9 * self.throttle + 0.1 * throttle) * self.APPMaxDisplacement)
                     data = [throttle_cmd,0,steer_cmd]
+                    print(data)
                     data_string = ','.join(map(str, data)) + '\n'
                     self.arduino.write(data_string.encode())
                     self.previous_steer = steer
                     self.throttle = throttle
 
-                    time.sleep(0.05)
-
+                    # time.sleep(0.05) handled by the parse_events_call
+                    self.arduino.reset_input_buffer()
                     self.controller.parse_events()
-                    #self.arduino.reset_input_buffer()
-                    ''' DON'T Know why but Arduino == Pain in ass =  True'''
-                    #print(self.arduino.readline().decode())
+                    print(self.arduino.readline().decode())
 
                 else:
                     self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
@@ -559,13 +559,13 @@ class DualControl(object):
         self._parser = ConfigParser()
         self._parser.read('wheel_config.ini')
         self._steer_idx = int(
-            self._parser.get('XboxSeriesController', 'steering_wheel'))
+            self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'steering_wheel'))
         self._throttle_idx = int(
-            self._parser.get('XboxSeriesController', 'throttle'))
-        self._brake_idx = int(self._parser.get('XboxSeriesController', 'brake'))
-        self._reverse_idx = int(self._parser.get('XboxSeriesController', 'reverse'))
+            self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'throttle'))
+        self._brake_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'brake'))
+        self._reverse_idx = int(self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'reverse'))
         self._handbrake_idx = int(
-            self._parser.get('XboxSeriesController', 'handbrake'))
+            self._parser.get('LogitechG920DrivingForceRacingWheelUSB', 'handbrake'))
 
     def parse_events(self):
         for event in pygame.event.get():
@@ -577,11 +577,11 @@ class DualControl(object):
                     # self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
                     self._parse_vehicle_wheel()
                     # self._control.reverse = self._control.gear < 0
-                    print('in parse_events_loop')
+                    #print('in parse_events_loop')
             else:
                 pass
             self.EGO_VEHICLE.apply_control(self._control)
-            print(self._control)
+            #print(self._control)
 
 
     def _parse_vehicle_wheel(self):
@@ -598,14 +598,14 @@ class DualControl(object):
 
         K2 = 1.6  # 1.6
         throttleCmd = K2 + (2.05 * math.log10(
-            -0.7 * -jsInputs[self._throttle_idx] + 1.4) - 1.2) / 0.92
+            -0.7 * jsInputs[self._throttle_idx] + 1.4) - 1.2) / 0.92
         if throttleCmd <= 0:
             throttleCmd = 0
         elif throttleCmd > 1:
             throttleCmd = 1
 
         brakeCmd = 1.6 + (2.05 * math.log10(
-            -0.7 * -jsInputs[self._brake_idx] + 1.4) - 1.2) / 0.92
+            -0.7 * jsInputs[self._brake_idx] + 1.4) - 1.2) / 0.92
         if brakeCmd <= 0:
             brakeCmd = 0
         elif brakeCmd > 1:
