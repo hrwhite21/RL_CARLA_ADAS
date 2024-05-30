@@ -29,7 +29,7 @@ class ClientConnection:
             new_world_settings = world.get_settings()
             new_world_settings.synchronous_mode = self.synchronus
             if self.synchronus:
-                new_world_settings.fixed_delta_seconds = 0.05 # can change this val later
+                new_world_settings.fixed_delta_seconds = 0.02 # can change this val later
  
             self.world = self.client.load_world(self.town)
             self.world.set_weather(carla.WeatherParameters.CloudyNoon)
