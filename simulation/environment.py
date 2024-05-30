@@ -29,7 +29,7 @@ class CarlaEnvironment():
         self.checkpoint_frequency = checkpoint_frequency
         self.route_waypoints = None
         self.town = town
-        
+        self.synchronus = self.world.get_settings().synchronous_mode
         # Objects to be kept alive
         self.camera_obj = None
         self.env_camera_obj = None
@@ -40,7 +40,7 @@ class CarlaEnvironment():
         self.sensor_list = list()
         self.actor_list = list()
         self.walker_list = list()
-        self.create_pedestrians()
+        # self.create_pedestrians()
 
         # Established Serial Connection to arduino if DIL is enabled
         self.DIL = DIL
@@ -70,7 +70,7 @@ class CarlaEnvironment():
                 reset_to_zero = [0,0,0]
                 data_string = ','.join(map(str, reset_to_zero)) + '\n'
                 self.arduino.write(data_string.encode())
-                time.sleep(0.5)
+                time.sleep(0.1)
                 # self.controller.parse_events()
 
 
@@ -88,13 +88,18 @@ class CarlaEnvironment():
                 self.total_distance = 250
 
             self.vehicle = self.world.try_spawn_actor(vehicle_bp, transform)
+            
             self.actor_list.append(self.vehicle)
-            self.controller = DualControl(self.vehicle)
+            self.controller = DualControl(self.vehicle) if self.DIL else None
+            self.world.tick()
             # Camera Sensor
             ''' Will replace this with webcam image in later trials?'''
             self.camera_obj = CameraSensor(self.vehicle)
+            
             while(len(self.camera_obj.front_camera) == 0):
                 time.sleep(0.0001)
+                self.world.tick() if self.world.get_settings().synchronous_mode else None
+            
             self.image_obs = self.camera_obj.front_camera.pop(-1)
             self.sensor_list.append(self.camera_obj.sensor)
 
@@ -159,7 +164,7 @@ class CarlaEnvironment():
             self.navigation_obs = np.array([self.throttle, self.velocity, self.previous_steer, self.distance_from_center, self.angle])
 
                         
-            time.sleep(0.5)
+            time.sleep(0.5) # Could be shorter? Could Modify spawn point location to be slightly closer to ground?
             self.collision_history.clear()
 
             self.episode_start_time = time.time()
@@ -205,6 +210,7 @@ class CarlaEnvironment():
                     
                     steer_cmd = int((0.9 * self.previous_steer + 0.1 * steer) * self.SWMaxDisplacement)
                     throttle_cmd = int((0.9 * self.throttle + 0.1 * throttle) * self.APPMaxDisplacement)
+                    #Could try replacing these with just the command and seeing what happens?
                     data = [throttle_cmd,0,steer_cmd]
                     print(data)
                     data_string = ','.join(map(str, data)) + '\n'
@@ -315,6 +321,7 @@ class CarlaEnvironment():
 
             while(len(self.camera_obj.front_camera) == 0):
                 time.sleep(0.0001)
+                self.world.tick() if self.world.get_settings().synchronous_mode else None
 
             self.image_obs = self.camera_obj.front_camera.pop(-1)
             normalized_velocity = self.velocity/self.target_speed

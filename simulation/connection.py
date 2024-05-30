@@ -14,9 +14,10 @@ import carla
 from simulation.settings import PORT, TIMEOUT, HOST
 
 class ClientConnection:
-    def __init__(self, town):
+    def __init__(self, town, sync_mode):
         self.client = None
         self.town = town
+        self.synchronus = sync_mode
 
     def setup(self):
         try:
@@ -24,8 +25,15 @@ class ClientConnection:
             # Connecting to the  Server
             self.client = carla.Client(HOST, PORT)
             self.client.set_timeout(TIMEOUT)
+            world = self.client.get_world()
+            new_world_settings = world.get_settings()
+            new_world_settings.synchronous_mode = self.synchronus
+            if self.synchronus:
+                new_world_settings.fixed_delta_seconds = 0.05 # can change this val later
+ 
             self.world = self.client.load_world(self.town)
             self.world.set_weather(carla.WeatherParameters.CloudyNoon)
+            self.world.apply_settings(new_world_settings)
             return self.client, self.world
 
         except Exception as e:

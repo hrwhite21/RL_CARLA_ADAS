@@ -33,7 +33,8 @@ def parse_args():
     parser.add_argument('--load-checkpoint', type=bool, default=MODEL_LOAD, help='resume training?')
     parser.add_argument('--torch-deterministic', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, `torch.backends.cudnn.deterministic=False`')
     parser.add_argument('--cuda', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, cuda will not be enabled by deafult')
-    parser.add_argument('--DIL', type=bool, default=True, help= 'Use Steering Wheel and Pedals?')
+    parser.add_argument('--DIL', type=bool, default=False, help= 'Use Steering Wheel and Pedals?')
+    parser.add_argument('--sync', type=bool, default=True, help='Run Client and Server Synchronously?')
     args = parser.parse_args()
     
     return args
@@ -58,7 +59,7 @@ def runner():
     checkpoint_load = args.load_checkpoint
     total_timesteps = args.total_timesteps
     action_std_init = args.action_std_init
-
+    sync_mode = args.sync
     try:
         if exp_name == 'ppo':
             run_name = "PPO"
@@ -105,7 +106,7 @@ def runner():
     #========================================================================
 
     try:
-        client, world = ClientConnection(town).setup()
+        client, world = ClientConnection(town,sync_mode).setup()
         logging.info("Connection has been setup successfully.")
     except:
         logging.error("Connection has been refused by the server.")
@@ -147,6 +148,7 @@ def runner():
             while timestep < total_timesteps:
             
                 observation = env.reset()
+                world.tick() if world.get_setting().synchronous_mode else None
                 observation = encode.process(observation)
 
                 current_ep_reward = 0
@@ -241,12 +243,15 @@ def runner():
             #Testing
             while timestep < args.test_timesteps:
                 observation = env.reset()
+                world.tick() if world.get_settings().synchronous_mode else None ##!
                 observation = encode.process(observation)
 
                 current_ep_reward = 0
                 t1 = datetime.now()
                 for t in range(args.episode_length):
-                    clock.tick_busy_loop(60)
+                    world.tick() if world.get_settings().synchronous_mode else None
+                
+                    #clock.tick_busy_loop(60)
                     # select action with policy
                     action = agent.get_action(observation, train=False)
                     observation, reward, done, info = env.step(action)
