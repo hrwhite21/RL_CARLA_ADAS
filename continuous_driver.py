@@ -34,7 +34,7 @@ def parse_args():
     parser.add_argument('--torch-deterministic', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, `torch.backends.cudnn.deterministic=False`')
     parser.add_argument('--cuda', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, cuda will not be enabled by deafult')
     parser.add_argument('--DIL', type=bool, default=True, help= 'Use Steering Wheel and Pedals?')
-    parser.add_argument('--sync', type=bool, default=True, help='Run Client and Server Synchronously?')
+    parser.add_argument('--sync', type=bool, default=False, help='Run Client and Server Synchronously?')
     args = parser.parse_args()
     
     return args
@@ -148,7 +148,7 @@ def runner():
             while timestep < total_timesteps:
             
                 observation = env.reset()
-                world.tick() if world.get_setting().synchronous_mode else None
+                # world.tick() if world.get_setting().synchronous_mode else None
                 observation = encode.process(observation)
 
                 current_ep_reward = 0
@@ -243,7 +243,7 @@ def runner():
             #Testing
             while timestep < args.test_timesteps:
                 observation = env.reset()
-                world.tick() if world.get_settings().synchronous_mode else None ##!
+                # world.tick() if world.get_settings().synchronous_mode else None ##!
                 observation = encode.process(observation)
 
                 current_ep_reward = 0
@@ -254,7 +254,7 @@ def runner():
                     # select action with policy
                     action = agent.get_action(observation, train=False)
                     observation, reward, done, info = env.step(action)
-                    world.tick() if world.get_settings().synchronous_mode else None
+                    # world.tick() if world.get_settings().synchronous_mode else None
 
                     if observation is None:
                         break

@@ -91,14 +91,14 @@ class CarlaEnvironment():
             
             self.actor_list.append(self.vehicle)
             self.controller = DualControl(self.vehicle) if self.DIL else None
-            self.world.tick()
+            # self.world.tick()
             # Camera Sensor
             ''' Will replace this with webcam image in later trials?'''
             self.camera_obj = CameraSensor(self.vehicle)
             
             while(len(self.camera_obj.front_camera) == 0):
                 time.sleep(0.0001)
-                self.world.tick() if self.world.get_settings().synchronous_mode else None
+                # self.world.tick() if self.world.get_settings().synchronous_mode else None
             
             self.image_obs = self.camera_obj.front_camera.pop(-1)
             self.sensor_list.append(self.camera_obj.sensor)
@@ -219,9 +219,12 @@ class CarlaEnvironment():
                     self.throttle = throttle
 
                     # time.sleep(0.05) handled by the parse_events_call
+                    
+                    self.world.wait_for_tick()
                     self.arduino.reset_input_buffer()
                     self.controller.parse_events()
                     print(self.arduino.readline().decode())
+                    self.world.tick()
 
                 else:
                     self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
@@ -321,7 +324,7 @@ class CarlaEnvironment():
 
             while(len(self.camera_obj.front_camera) == 0):
                 time.sleep(0.0001)
-                self.world.tick() if self.world.get_settings().synchronous_mode else None
+                # self.world.tick() if self.world.get_settings().synchronous_mode else None
 
             self.image_obs = self.camera_obj.front_camera.pop(-1)
             normalized_velocity = self.velocity/self.target_speed
@@ -601,6 +604,7 @@ class DualControl(object):
         # Custom function to map range of inputs [1, -1] to outputs [0, 1] i.e 1 from inputs means nothing is pressed
         # For the steering, it seems fine as it is
         K1 = 1.0  # 0.55
+        ### Change Scale factor here to 3.95 to decrease amount wheel has to turn to get "Full Lock"
         steerCmd = K1 * math.tan(1.1 * jsInputs[self._steer_idx])
 
         K2 = 1.6  # 1.6
