@@ -5,10 +5,11 @@ const int BPPdirPin = 5;   // Direction pin connected to digital pin 5
 const int SWstepPin = 6;   // Step pin connected to digital pin 6
 const int SWdirPin = 7;    // Direction pin connected to digital pin 7
 // The following values are based on hand calibration
-const int delayMicros = 1250; // 5000 microseconds = 5 milliseconds
+const int delayMicros = 700; // 5000 microseconds = 5 milliseconds
 const int APPMaxDisplacement = 690; 
 const int BPPMaxDisplacement = 660;
-const int SWMaxDisplacement = 1210;
+const int SWMaxDisplacement = 400; //1210 - this changes becasue of the 3.95 scaling in python on inputs,
+                                  // but doesn't HAVE to, necessarily.;
 int APPPos = 0;
 int BPPPos = 0;
 int SWPos = 0;
@@ -27,7 +28,7 @@ void setup() {
   digitalWrite(BPPdirPin, HIGH);
   digitalWrite(SWdirPin, HIGH);
 
-  Serial.begin(9600);
+  Serial.begin(19200);
 }
 
 void loop() {
@@ -123,11 +124,4 @@ void StepHandler(int values[]) {
   }
 }
 
-void printArray(int values[], int size) {
-  for (int i = 0; i < size; i++) {
-    Serial.print(values[i]);
-    Serial.print(" "); // Add a space between each value for better readability
-  }
-  Serial.println(); // Print a newline at the end to move to the next line in the serial monitor
-}
 

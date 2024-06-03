@@ -46,10 +46,10 @@ class CarlaEnvironment():
         self.DIL = DIL
         if DIL:
             # COM4 if at apartment and Elegoo, COM7 if Arduino and LAbPC COM8 if Elego and Lab
-            self.arduino = serial.Serial('COM7',9600,timeout=10,write_timeout=0)
+            self.arduino = serial.Serial('COM7',19200,timeout=10,write_timeout=0)
             self.APPMaxDisplacement = 690
             self.BPPMaxDisplacement = 660
-            self.SWMaxDisplacement = 1100
+            self.SWMaxDisplacement = 400
             # self.controller = DualControl(world)
             clock = pygame.time.Clock()
    
@@ -70,7 +70,6 @@ class CarlaEnvironment():
                 reset_to_zero = [0,0,0]
                 data_string = ','.join(map(str, reset_to_zero)) + '\n'
                 self.arduino.write(data_string.encode())
-                time.sleep(0.1)
                 # self.controller.parse_events()
 
 
@@ -86,9 +85,9 @@ class CarlaEnvironment():
             else:
                 transform = random.choice(self.map.get_spawn_points())
                 self.total_distance = 250
-
+            transform.location.z = transform.location.z - 2.15
             self.vehicle = self.world.try_spawn_actor(vehicle_bp, transform)
-            
+            # print(transform) # should have a component ~ 0.8 instead of 2.3
             self.actor_list.append(self.vehicle)
             self.controller = DualControl(self.vehicle) if self.DIL else None
             # self.world.tick()
@@ -164,7 +163,7 @@ class CarlaEnvironment():
             self.navigation_obs = np.array([self.throttle, self.velocity, self.previous_steer, self.distance_from_center, self.angle])
 
                         
-            time.sleep(0.5) # Could be shorter? Could Modify spawn point location to be slightly closer to ground?
+            time.sleep(0.1) # Could be shorter? Could Modify spawn point location to be slightly closer to ground?
             self.collision_history.clear()
 
             self.episode_start_time = time.time()
@@ -201,9 +200,9 @@ class CarlaEnvironment():
             if self.continous_action_space:
                 steer = float(action_idx[0])
                 steer = max(min(steer, 1.0), -1.0)
-                throttle = float((action_idx[1] + 1.0)/2)
+                throttle = float((action_idx[1] + 1)/2)
                 throttle = max(min(throttle, 1.0), 0.0)
-
+                
                 ''' THIS IS WHERE THINGS GET HAIRY'''
                     # May need to add logic to stop jitter?
                 if self.DIL == True:
@@ -211,20 +210,24 @@ class CarlaEnvironment():
                     steer_cmd = int((0.9 * self.previous_steer + 0.1 * steer) * self.SWMaxDisplacement)
                     throttle_cmd = int((0.9 * self.throttle + 0.1 * throttle) * self.APPMaxDisplacement)
                     #Could try replacing these with just the command and seeing what happens?
+                    print("Commands_flt: ", [(0.9 * self.previous_steer + 0.1 * steer), (0.9 * self.throttle + 0.1 * throttle)])
                     data = [throttle_cmd,0,steer_cmd]
-                    print(data)
+                    print("Commands_int:", data)
                     data_string = ','.join(map(str, data)) + '\n'
                     self.arduino.write(data_string.encode())
                     self.previous_steer = steer
                     self.throttle = throttle
 
-                    # time.sleep(0.05) handled by the parse_events_call
+                    # time.sleep(0.05) handled by the parse_events_call? NOt acutally sure if it is blocking or not
                     
-                    self.world.wait_for_tick()
+                    # self.world.wait_for_tick() # Looks like this doesn't actually work.
+                    
+                    
                     self.arduino.reset_input_buffer()
                     self.controller.parse_events()
                     print(self.arduino.readline().decode())
-                    self.world.tick()
+                    
+                    # self.world.tick()
 
                 else:
                     self.vehicle.apply_control(carla.VehicleControl(steer=self.previous_steer*0.9 + steer*0.1, throttle=self.throttle*0.9 + throttle*0.1))
@@ -605,7 +608,7 @@ class DualControl(object):
         # For the steering, it seems fine as it is
         K1 = 1.0  # 0.55
         ### Change Scale factor here to 3.95 to decrease amount wheel has to turn to get "Full Lock"
-        steerCmd = K1 * math.tan(1.1 * jsInputs[self._steer_idx])
+        steerCmd = K1 * math.tan(3.95 * jsInputs[self._steer_idx])
 
         K2 = 1.6  # 1.6
         throttleCmd = K2 + (2.05 * math.log10(

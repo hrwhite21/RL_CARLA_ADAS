@@ -33,7 +33,7 @@ def parse_args():
     parser.add_argument('--load-checkpoint', type=bool, default=MODEL_LOAD, help='resume training?')
     parser.add_argument('--torch-deterministic', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, `torch.backends.cudnn.deterministic=False`')
     parser.add_argument('--cuda', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, cuda will not be enabled by deafult')
-    parser.add_argument('--DIL', type=bool, default=False, help= 'Use Steering Wheel and Pedals?')
+    parser.add_argument('--DIL', type=bool, default=True, help= 'Use Steering Wheel and Pedals?')
     parser.add_argument('--sync', type=bool, default=False, help='Run Client and Server Synchronously?')
     args = parser.parse_args()
     
@@ -253,6 +253,7 @@ def runner():
                     #clock.tick_busy_loop(60)
                     # select action with policy
                     action = agent.get_action(observation, train=False)
+                    print("Agent Action:", action)
                     observation, reward, done, info = env.step(action)
                     # world.tick() if world.get_settings().synchronous_mode else None
 

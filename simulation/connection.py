@@ -34,6 +34,11 @@ class ClientConnection:
             self.world = self.client.load_world(self.town)
             self.world.set_weather(carla.WeatherParameters.CloudyNoon)
             self.world.apply_settings(new_world_settings)
+            if self.town == "Town07":
+                loc_rot = carla.Transform(carla.Location(x=72.651,y=-5.4441,z=62.4744),
+                                          carla.Rotation(pitch=-55.919,roll=8.2287e-05,yaw=-78.21569))
+                self.world.get_spectator().set_transform(loc_rot)
+
             return self.client, self.world
 
         except Exception as e:
