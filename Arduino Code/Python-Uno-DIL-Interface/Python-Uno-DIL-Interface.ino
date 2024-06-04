@@ -1,58 +1,38 @@
-// Define pin mappings
-const int APPstepPin = 2;  // Step pin connected to digital pin 2 (PD2)
-const int APPdirPin = 3;   // Direction pin connected to digital pin 3 (PD3)
-const int BPPstepPin = 4;  // Step pin connected to digital pin 4 (PD4)
-const int BPPdirPin = 5;   // Direction pin connected to digital pin 5 (PD5)
-const int SWstepPin = 6;   // Step pin connected to digital pin 6 (PD6)
-const int SWdirPin = 7;    // Direction pin connected to digital pin 7 (PD7)
-
-const int delayMicros = 700; // 5000 microseconds = 5 milliseconds
-const int APPMaxDisplacement = 690; 
-const int BPPMaxDisplacement = 660;
-const int SWMaxDisplacement = 400;
-
-int APPPos = 0;
-int BPPPos = 0;
-int SWPos = 0;
-
-const int printInterval = 1000;
-unsigned long previousMillis = millis();
-
-void setup() {
-  // Set pins as outputs
-  DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4) | (1 << PD5) | (1 << PD6) | (1 << PD7);
-
-  // Set direction pins to HIGH
-  PORTD |= (1 << PD3) | (1 << PD5) | (1 << PD7);
-
-  Serial.begin(19200);
-}
+const int bufferSize = 64; // Adjust buffer size as needed
+char inputBuffer[bufferSize];
+int bufferIndex = 0;
 
 void loop() {
-  if (Serial.available() > 0) {
-    String data = Serial.readStringUntil('\n'); // Read data until newline character
-    int values[3];
-    parseData(data, values); // Parse and process the received data
-    constrainVals(values);
-    StepHandler(values);
-    Serial.println(" A: " + String(APPPos) + " B: " + String(BPPPos) + " SW: " + String(SWPos));
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c == '\n') {
+      inputBuffer[bufferIndex] = '\0'; // Null-terminate the string
+      bufferIndex = 0;
+      
+      int values[3];
+      parseData(inputBuffer, values);
+      constrainVals(values);
+      StepHandler(values);
+      
+      // Use a more efficient method to form the output string
+      char output[64];
+      sprintf(output, " A: %d B: %d SW: %d", APPPos, BPPPos, SWPos);
+      Serial.println(output);
+    } else {
+      if (bufferIndex < bufferSize - 1) {
+        inputBuffer[bufferIndex++] = c;
+      }
+    }
   }
 }
 
-void parseData(String data, int values[]) {
-    int valueidx = 0;
-    char* ptr = data.c_str();
-    while (*ptr != '\0') {
-        if (isdigit(*ptr)) {
-            break;
-        }
-        ptr++;
-    }
-    ptr = strtok(ptr, ",");
-    while (ptr != NULL && valueidx < 3) {
-        values[valueidx++] = strtol(ptr, NULL, 10);
-        ptr = strtok(NULL, ",]"); // Get the next token, also consider ']'
-    }
+void parseData(char* data, int values[]) {
+  int valueidx = 0;
+  char* ptr = data;
+  while (*ptr != '\0' && valueidx < 3) {
+    values[valueidx++] = strtol(ptr, &ptr, 10);
+    if (*ptr == ',') ptr++; // Skip the comma
+  }
 }
 
 void constrainVals(int values[]) {
@@ -62,44 +42,48 @@ void constrainVals(int values[]) {
 }
 
 void StepHandler(int values[]) {
+  int APPDirMultiplier = (PORTD & (1 << PD3)) ? 1 : -1;
+  int BPPDirMultiplier = (PORTD & (1 << PD5)) ? 1 : -1;
+  int SWDirMultiplier = (PORTD & (1 << PD7)) ? 1 : -1;
+
   if (APPPos < values[0]) {
-    PORTD |= (1 << PD3); // Set APPdirPin HIGH
+    PORTD |= (1 << PD3);
   } else if (APPPos > values[0]) {
-    PORTD &= ~(1 << PD3); // Set APPdirPin LOW
+    PORTD &= ~(1 << PD3);
   }
 
   if (BPPPos > values[1]) {
-    PORTD |= (1 << PD5); // Set BPPdirPin HIGH
+    PORTD |= (1 << PD5);
   } else if (BPPPos < values[1]) {
-    PORTD &= ~(1 << PD5); // Set BPPdirPin LOW
+    PORTD &= ~(1 << PD5);
   }
 
   if (SWPos < values[2]) {
-    PORTD |= (1 << PD7); // Set SWdirPin HIGH
+    PORTD |= (1 << PD7);
   } else if (SWPos > values[2]) {
-    PORTD &= ~(1 << PD7); // Set SWdirPin LOW
+    PORTD &= ~(1 << PD7);
   }
 
   while (APPPos != values[0] || BPPPos != values[1] || SWPos != values[2]) {
     if (APPPos != values[0]) {
-      PORTD |= (1 << PD2); // Set APPstepPin HIGH
-      APPPos += (2 * ((PORTD & (1 << PD3)) >> PD3) - 1);
+      PORTD |= (1 << PD2);
+      APPPos += APPDirMultiplier;
     }
 
     if (BPPPos != values[1]) {
-      PORTD |= (1 << PD4); // Set BPPstepPin HIGH
-      BPPPos += (2 * ((PORTD & (1 << PD5)) >> PD5) - 1);
+      PORTD |= (1 << PD4);
+      BPPPos += BPPDirMultiplier;
     }
 
     if (SWPos != values[2]) {
-      PORTD |= (1 << PD6); // Set SWstepPin HIGH
-      SWPos += (2 * ((PORTD & (1 << PD7)) >> PD7) - 1);
+      PORTD |= (1 << PD6);
+      SWPos += SWDirMultiplier;
     }
 
     delayMicroseconds(delayMicros);
 
-    PORTD &= ~(1 << PD2); // Set APPstepPin LOW
-    PORTD &= ~(1 << PD4); // Set BPPstepPin LOW
-    PORTD &= ~(1 << PD6); // Set SWstepPin LOW
+    PORTD &= ~(1 << PD2);
+    PORTD &= ~(1 << PD4);
+    PORTD &= ~(1 << PD6);
   }
 }
