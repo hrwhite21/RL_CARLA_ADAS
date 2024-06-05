@@ -46,7 +46,7 @@ class CarlaEnvironment():
         self.DIL = DIL
         if DIL:
             # COM4 if at apartment and Elegoo, COM7 if Arduino and LAbPC COM8 if Elego and Lab
-            self.arduino = serial.Serial('COM7',19200,timeout=10,write_timeout=0)
+            self.arduino = serial.Serial('COM7',115200,timeout=10,write_timeout=0)
             self.APPMaxDisplacement = 690
             self.BPPMaxDisplacement = 660
             self.SWMaxDisplacement = 400
@@ -70,6 +70,7 @@ class CarlaEnvironment():
                 reset_to_zero = [0,0,0]
                 data_string = ','.join(map(str, reset_to_zero)) + '\n'
                 self.arduino.write(data_string.encode())
+                time.sleep(0.25)
                 # self.controller.parse_events()
 
 
@@ -96,8 +97,9 @@ class CarlaEnvironment():
             self.camera_obj = CameraSensor(self.vehicle)
             
             while(len(self.camera_obj.front_camera) == 0):
+                print('Stuck!')
                 time.sleep(0.0001)
-                # self.world.tick() if self.world.get_settings().synchronous_mode else None
+                self.world.tick() if self.world.get_settings().synchronous_mode else None
             
             self.image_obs = self.camera_obj.front_camera.pop(-1)
             self.sensor_list.append(self.camera_obj.sensor)
@@ -222,11 +224,11 @@ class CarlaEnvironment():
                     
                     # self.world.wait_for_tick() # Looks like this doesn't actually work.
                     
-                    
+
                     self.arduino.reset_input_buffer()
                     self.controller.parse_events()
                     print(self.arduino.readline().decode())
-                    
+
                     # self.world.tick()
 
                 else:
@@ -590,10 +592,11 @@ class DualControl(object):
                     # self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
                     self._parse_vehicle_wheel()
                     # self._control.reverse = self._control.gear < 0
-                    #print('in parse_events_loop')
+                    #print('in parse_events_loop')            
+                    self.EGO_VEHICLE.apply_control(self._control)
             else:
                 pass
-            self.EGO_VEHICLE.apply_control(self._control)
+            # self.EGO_VEHICLE.apply_control(self._control)
             #print(self._control)
 
 

@@ -29,7 +29,7 @@ class ClientConnection:
             new_world_settings = world.get_settings()
             new_world_settings.synchronous_mode = self.synchronus
             if self.synchronus:
-                new_world_settings.fixed_delta_seconds = 0.02 # can change this val later
+                new_world_settings.fixed_delta_seconds = 0.05 # can change this val later
  
             self.world = self.client.load_world(self.town)
             self.world.set_weather(carla.WeatherParameters.CloudyNoon)
@@ -38,7 +38,7 @@ class ClientConnection:
                 loc_rot = carla.Transform(carla.Location(x=72.651,y=-5.4441,z=62.4744),
                                           carla.Rotation(pitch=-55.919,roll=8.2287e-05,yaw=-78.21569))
                 self.world.get_spectator().set_transform(loc_rot)
-
+            world.tick() if self.synchronus else None
             return self.client, self.world
 
         except Exception as e:
