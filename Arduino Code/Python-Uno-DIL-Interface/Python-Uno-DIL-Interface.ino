@@ -5,7 +5,7 @@
 // const int SWstepPin = 6;   // Step pin connected to digital pin 6
 // const int SWdirPin = 7;    // Direction pin connected to digital pin 7
 
-const int delayMicros = 400; // 5000 microseconds = 5 milliseconds
+const int delayMicros = 425; // 5000 microseconds = 5 milliseconds
 const int APPMaxDisplacement = 690; 
 const int BPPMaxDisplacement = 660;
 const int SWMaxDisplacement = 400;
