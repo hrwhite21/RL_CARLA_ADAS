@@ -20,7 +20,7 @@ clock = pgtime.Clock()
 def parse_args():
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('--exp-name', type=str, default= 'ppo', help='name of the experiment')
+    parser.add_argument('--exp-name', type=str, default= 'ppo-retrain', help='name of the experiment')
     parser.add_argument('--env-name', type=str, default='carla', help='name of the simulation environment')
     parser.add_argument('--learning-rate', type=float, default=PPO_LEARNING_RATE, help='learning rate of the optimizer')
     parser.add_argument('--seed', type=int, default=SEED, help='seed of the experiment')
@@ -28,13 +28,13 @@ def parse_args():
     parser.add_argument('--action-std-init', type=float, default=ACTION_STD_INIT, help='initial exploration noise')
     parser.add_argument('--test-timesteps', type=int, default=(TEST_TIMESTEPS*100), help='timesteps to test our model')
     parser.add_argument('--episode-length', type=int, default=EPISODE_LENGTH, help='max timesteps in an episode')
-    parser.add_argument('--train', default=False, type=boolean_string, help='is it training?')
+    parser.add_argument('--train', default=True, type=boolean_string, help='is it training?')
     parser.add_argument('--town', type=str, default="Town07", help='which town do you like?')
     parser.add_argument('--load-checkpoint', type=bool, default=MODEL_LOAD, help='resume training?')
     parser.add_argument('--torch-deterministic', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, `torch.backends.cudnn.deterministic=False`')
     parser.add_argument('--cuda', type=lambda x:bool(strtobool(x)), default=True, nargs='?', const=True, help='if toggled, cuda will not be enabled by deafult')
-    parser.add_argument('--DIL', type=bool, default=True, help= 'Use Steering Wheel and Pedals?')
-    parser.add_argument('--sync', type=bool, default=True, help='Run Client and Server Synchronously?')
+    parser.add_argument('--DIL', type=bool, default=False, help= 'Use Steering Wheel and Pedals?')
+    parser.add_argument('--sync', type=bool, default=False, help='Run Client and Server Synchronously?')
     args = parser.parse_args()
     
     return args
@@ -63,6 +63,9 @@ def runner():
     try:
         if exp_name == 'ppo':
             run_name = "PPO"
+
+        elif exp_name == 'ppo-retrain':
+            run_name = "PPO_retrain"
         else:
             """
             
@@ -123,7 +126,7 @@ def runner():
     #                           ALGORITHM
     #========================================================================
     try:
-        time.sleep(0.5)
+        time.sleep(0.25)
         
         if checkpoint_load:
             chkt_file_nums = len(next(os.walk(f'checkpoints/PPO/{town}'))[2]) - 1
@@ -256,7 +259,6 @@ def runner():
                     action = agent.get_action(observation, train=False)
                     print("Agent Action:", action)
                     observation, reward, done, info = env.step(action)
-                    time.sleep(0.1)
                     world.tick() if world.get_settings().synchronous_mode else None
 
                     if observation is None:

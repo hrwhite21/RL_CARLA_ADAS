@@ -28,6 +28,7 @@ class CameraSensor():
         front_camera_bp.set_attribute('image_size_x', f'160')
         front_camera_bp.set_attribute('image_size_y', f'80')
         front_camera_bp.set_attribute('fov', f'125')
+        front_camera_bp.set_attribute('sensor_tick', f'0.1')
         front_camera = world.spawn_actor(front_camera_bp, carla.Transform(
             carla.Location(x=2.4, z=1.5), carla.Rotation(pitch= -10)), attach_to=self.parent)
         return front_camera
