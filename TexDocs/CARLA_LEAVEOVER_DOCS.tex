@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt,oneside,letterpaper]{article}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -7,7 +7,8 @@
 \usepackage{tikz}
 \usepackage{amsmath}
 \usepackage{caption}
-
+\usepackage[margin=0.6in]{geometry}
+\usepackage{pdflscape}
 \title{CARLA Leave-Over Documentation}
 \author{Hunter White}
 \date{April 2024}
@@ -132,13 +133,15 @@ A PICTURE OF THESE MOTORS IS PROVIDED BELOW
 \item(Power Supply/Supplies) Originally, the stepper motors and motor drivers were powered by a single 24V 15A DC power supply, similar to \href{https://www.amazon.com/Switching-SJHPRMXF-Universal-Regulated-Transformer/dp/B0BWC8J2HY/ref=sr_1_4?crid=2KFHB4ZPW918C&dib=eyJ2IjoiMSJ9.FPK3xtReWIHdljtMiM5tJdXhBQ5q_-IO-pflt5CI00iFDB9iYGMc79Ty_FO0dvSjdtl0D0Zih9khd_51xjQamVo7iaApGN1fatpqVmezqN7-BDClRtcv_gsEr8ofznzE0bb5uG-HI-YOc7R0-aT_jQXBuObvvQguQbhkOHwR9Rz7JSEfk6LCDIEusBev-jj4meyV8GGQBtdx2AE4DfrnhkPKcfrdVDSSCgHEC-I6Ccjzjrr8_a77e0xSFJ9ziQedmuPHjgInys8orLajkbVt0rwaIr624xeHIuU9LhTWBNQ.29UMZP6yEU8jGo2FBFcXFL1GxivPtxQHOTDhLT26qvg&}{this generic amazon posting}. This primary power supply was connected in series with another 24V 15A power supply following\href{https://www.youtube.com/watch?v=jbzb66dCbOc}{this YouTube video}. \textbf{PLEASE BE AWARE: this is generally a bad idea, for numerous reasons. Improperly sized wires, undersized power supply components, and numerous electrical phenomena beyond my comprehension render this a dangerous, hacky solution at best. This should be replaced by a PROPER 48V or 60V power supply at an apropriate amperage rating as soon as possible.}
 
 \end{enumerate}
-\newpage
+\begin{landscape}
 \subsection{Wiring Diagram}
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth, trim=3.5cm 4.5cm 5.0cm 2.5cm, clip,scale=1.5]{Print Schematic_R7.pdf}
 \caption{Complete wiring diagram for the fully connected electrical system. \textbf{Note:} The colors and sizing of wires may not match, and all connections should be verified before testing circuit functionality}
 \end{figure}
+\end{landscape}
+\newpage
 \subsection{Arduino Configuration and Code Walkthrough}
 The Arduino code for interfacing between Python, CARLA, and the Driving Simulator can be found \href{https://github.com/hrwhite21/DriverlessDIL/blob/main/PythonToMotor/PythonToMotor.ino}{here}. In its current implementation, the bits corresponding to the pins for the step and direction function are directly manipulated (set to 1, 0, or -1) instead of being changed via the traditional DigitalRead() and DigitalWrite() functions. This reduces the amount of time required to change the pins by a significant amount. Unfortunately, this makes the code VERY difficult to read and debug. A more understandable version can be found in the \href{https://tinyurl.com/2s4kpnuv}{the commit history for the aruino ".ino" file.}
 \\
