@@ -202,7 +202,7 @@ This section will cover the included code files and any other software included 
 Several files are included in this project, separated into various folders. Each file handles a specific task during the simulation. The folders and files are listed below, including a short description of their purpose.
 \begin{itemize}
 \item FILE -- Python-Uno-DIL-Interface.ino : This file initializes the serial communication port between the arduino and the computer, and contains the logic that actuates the stepper motors to a specific position. This file can also be used as a standalone way to test the functionality of the arduino and stepper motor system, and it most often used during debugging and calibration.
-\item FOLDER -- autoencoder : This folder contains all of the python files associated with creating and using the variational autoencoder. Variational Autoencoders (VAEs) are a type of generative model in machine learning, introduced by Kingma and Welling in 2013. VAEs are designed to learn latent representations of input data that can be used to generate new, similar data.
+\item FOLDER -- autoencoder : This folder contains all of the python files associated with creating and using the variational autoencoder. Variational Autoencoders (VAEs) are a type of generative model in machine learning, introduced by Kingma and Welling in 2013. VAEs are designed to learn latent representations of input data that can be used to generate new, similar data. Generally, autoencoders are used as feature extractors in reinforcement learning, compressing a complex, high-dimensional observation space into a lower-dimension latent space. Lower dimensional representations are generally easier to learn, and using a VAE can sometimes reduce training time and improve agent robustness to unseen scenarios.
 \item FOLDER -- checkpoints : This folder contains all of the checkpoints for the proximal policy optimization (PPO) machine learning agent on both Town07 and Town02. The checkpoints are made every 100 episodes, and serve as a training log for the agent. These are useful for evaluating how well an agent was performing at different stages of training, but DO NOT contain the actual trained agents.
 \item FOLDER -- copy\_of\_PythonAPI\_for\_reference : This folder is a copy of the PythonAPI folder included in a CARLA installation. The files in these folders are extremely useful for learning how to interact with CARLA via python, and also include helpful functions for creating routes, changing weather, and adding sensors and actors to a CARLA instance. 
 \item FOLDER -- networks - This folder contains the python files that define the structure and functions associated with the PPO agent. These files can be useful for understanding the general structure of the agent and for understanding how to implement the underlying probability distrubutions using PyTorch. The agent used in the training/evaluation simulations is generated from these files.
@@ -217,7 +217,7 @@ Several files are included in this project, separated into various folders. Each
 
 \subsection{Primer on PPO}
 
-Proximal Policy Optimization (PPO) is a popular reinforcement learning (RL) algorithm designed to train agents to make decisions by interacting with an environment to maximize cumulative rewards. PPO stands out because it strikes a balance between performance and simplicity. PPO is a type of policy gradient method. Policy gradient methods optimize the policy directly, as opposed to value-based methods which optimize the value function. In simpler terms, a policy gradient method adjusts the policy (the agent’s behavior) based on feedback from the environment. PPO can be used in both discrete and continous action spaces, which makes it especially versatile - previous implementations of PPO in the fields of robotics and game playing have yielded incredible results. \\
+Proximal Policy Optimization (PPO) is a popular reinforcement learning (RL) algorithm designed to train agents to make decisions by interacting with an environment to maximize cumulative rewards. PPO stands out because it strikes a balance between performance and simplicity. PPO is an actor-critic based  policy gradient method. Policy gradient methods optimize the policy directly, as opposed to value-based methods which optimize the value function. In simpler terms, a policy gradient method adjusts the policy (the agent’s behavior) based on feedback from the environment. PPO can be used in both discrete and continous action spaces, which makes it especially versatile - previous implementations of PPO in the fields of robotics and game playing have yielded incredible results. \\
 
 \subsection{Key Concepts and Equations}
 \begin{itemize} 
@@ -238,5 +238,45 @@ Proximal Policy Optimization (PPO) is a popular reinforcement learning (RL) algo
 \item and $V(s_t) \text{ and } V(s_{t + 1}) $ follow the definitions of state-value functions above.
 \end{itemize}
 \end{itemize}
+\subsection{Goal of Project}
+The goal of this project is to develop a reinforcement learning (RL) agent,
+% specifically using Proximal Policy Optimization (PPO),  NOT SURE About this line
+to autonomously drive a vehicle within the CARLA simulation environment. The agent should effectively navigate urban and rural traffic scenarios, obey simple traffic rules, and be able to maintain a reasonable driving speed. The RL agent should process a visual input, either from CARLA or from a webcam directed at the screen, as well as vehicle telematic information, and output a corresponding tuple of (steering action, acceleration action, braking action).
+\subsection{Training and Environment Setup}
+The RL agent is implemented in Python 3.7.*, and utilizes the packages listed in \hyperlink{table:RequirementsTable}{requirements table}. Simulations and trainings were run on a system using an Nvidia Titan X, a 4-core Intel i7, and 32 GB of DDR4. The backbone of the training and implementation was adapted from \href{https://github.com/idreesshaikh/Autonomous-Driving-in-Carla-using-Deep-Reinforcement-Learning/tree/main}{this GitHub repository}, available under the MIT License. For compatability reasons, CARLA 0.9.8 with additional maps is used for training and evaluation. \\
+The PPO Agent is composed of an actor network and a critic network. These networks are constructed of 3 fully-connected layers, with 500 , 300, and 100 nodes, each with a hyperbolic tangent activation function. The output layer of the actor network contains $a_{dim}$ nodes, corresponding to the size of the action space, and uses a $\tanh$ activation function. For this project, $a_{dim} = 3; \text{a tuple of (steer, throttle, brake)} $. The output layer of the critic network contains a single node, which represents an estimation of the state-value function. This layer contains no activation function. \\
+The input to each network consists of the output of the VAE ([120,1]) and the following external features: current vehicle speed, previous steer action, current throttle/accelerator pedal position value, distance to the road center, and angular deviation from intended trajectory. \textbf{The Following Figure is included as a reference}:
+
+A simulation may be terminated for violating the following reasons: \\
+\begin{itemize}
+\item the vehicle has a deviation greater than 3 meters from the center of the lane
+\item the vehicle has a speed less than 1.0 km/hr after the first 10 simulated seconds have elapsed
+\item the vehicle collides with the environment or another actor (vehicle, pedestrian, etc.)
+\item the vehicle travels at a speed greater than the set maximum speed
+\item the vehicle exceeds the maximum number of timesteps per simulation
+\item the vehicle successfully completes its route
+\end{itemize}
+
+\subsection{State and Action Spaces}
+The state space of the agent consists of the enocded result of the VAE, plus the five external features mentioned above. The action space consists of the tuple (steer, throttle, brake), with the values being continuous and bounded by the sets $\left([-1,1],[0,1],[0,1]\right)$.
+
+\subsection{Reward Structure}
+To encourage the RL agent to learn appropriate traffic behaviors, the following reward structures are used:
+\[ \alpha_{reward}= \begin{cases}
+1- | \frac{\alpha_{\text{deviation}}}{\alpha_{\text{max deviation}}} | & \alpha_{\text{deviation}} < \alpha_{\text{max deviation}} \\
+0 & \text{otherwise}
+\end{cases}
+\]
+
+\[ R = \begin{cases}
+\frac{v}{v_{min}} * (1- d_{center} * \alpha_{reward}  & v < v_{min} \\
+(1- d_{center} * \alpha_{reward}  & v_{min} \leq v <v_{target} \\
+\left(1 - \frac{v - v_{target}}{v_{max} - v_{target}} \right) * (1- d_{center} * \alpha_{reward} & v \geq v_{target} \\
+-10 & \text{Upon Constraint Violation}
+\end{cases}
+\]
+
+
+
 \end{document}
 
