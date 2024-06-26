@@ -66,7 +66,7 @@ CARLA & 0.9.8 & N/A \\
 \label{table:RequirementsTable}
 \end{table}
 
-To install all of the above packages, open your prefered command line interface (cmd or powershell for windows, terminal for linux), and activate your conda environment. You can then install the packages in either of the following ways:
+To install all of the above packages, open your prefered command line interface and activate your conda environment. You can then install the packages in either of the following ways:
 
 \begin{enumerate}
 \item(Option 1: Individually) All required packages can be installed by navigating to each \begin{verbatim} requirements.txt \end{verbatim} within your local copy of the \href{https://github.com/hrwhite21/RL_CARLA_ADAS}{GitHub Repository} and running the command \begin{verbatim} pip install -r requirements.txt \end{verbatim} or \begin{verbatim}conda install --yes --file requirements.txt \end{verbatim} in the command prompt with the desired conda environment activated.
@@ -78,8 +78,9 @@ If you try option 2 and find that packages are missing, please try option 1.
 
 \section{How to Download and Install CARLA}
 \label{sec:CARLAInstall}
-\textbf{NOTE: CARLA requires a dedicated GPU for with at least 6GB of VRAM. This excludes most consumer laptops. More VRAM does not necessarily make CARLA run faster, but it does generally make CARLA more stable when adding large numbers of actors. CARLA also recommends having an addition GPU for any machine learning, although this is not necessary if your GPU has the capacity. (i.e. ~12 GB of VRAM and from a recent generation of Vulkan compatible GPUs)}
-CARLA is fairly easy to install, and the process is nearly identical for Windows and Linux (Ubuntu). Because we do not need the additional functionality gained by building CARLA from source, we can follow the \href{https://carla.readthedocs.io/en/latest/start_quickstart/}{quick getting started guide.} \textbf{NOTE: There are different versions of documentation that correspond to each released version of CARLA. Make sure you use the documentation version that corresponds to the CARLA version you intend to use.} Be sure to make sure that pip and/or conda are up to date before creating the environment. \\
+\textbf{NOTE: CARLA requires a dedicated GPU for with at least 6GB of VRAM. This excludes most consumer laptops.} More VRAM does not necessarily make CARLA run faster, but it does generally make CARLA more stable when adding large numbers of actors. CARLA also recommends having an addition GPU for any machine learning, although this is not necessary if your GPU has the capacity. (i.e. ~12 GB of VRAM and from a recent generation of Vulkan compatible GPUs)
+CARLA is fairly easy to install, %and the process is nearly identical for Windows and Linux (Ubuntu). 
+Because we do not need the additional functionality gained by building CARLA from source, we can follow the \href{https://carla.readthedocs.io/en/latest/start_quickstart/}{quick getting started guide.} \textbf{NOTE: There are different versions of documentation that correspond to each released version of CARLA.} Make sure you use the documentation version that corresponds to the CARLA version you intend to use. Be sure to make sure that pip and/or conda are up to date before creating the environment. \\
 
 
 \section{Verifying CARLA installation}
@@ -101,8 +102,7 @@ To start an instance of CARLA after navigating to the CARLA directory, simply ru
 \textbf{Insert default carla window here for 0.9.8}
 
 You can use the WASDQE keys to navigate the spectator camera around the default map. There's not much to see, as we haven't loaded in vehicles, pedestrians, etc. (a.k.a. "Actors"), but this will give you a feel for how smoothly CARLA runs on your device.
-\subsection{Opening a CARLA server instance: Linux (Ubuntu 20.04)}
- \textbf{TO BE WRITTEN}
+
 \subsection{running an example script}
 To add in some actors, we will need to open an additional terminal window, and make sure the conda environment is activated. The easiest way to do this is to install the powershell/command prompt shortcut in anaconda navigator, or by typing conda activate <your CARLA environment name>. You will see the name of your environment in parenthesis in your terminal prompt if you have successfully activated your environment. Next, navigate to the Python API examples directory within your CARLA directory using the terminal window with your activated conda environment. the examples directory should have a path similar to :
 \begin{verbatim}<your_carla_directory>\PythonAPI\.examples  \end{verbatim}
@@ -276,6 +276,13 @@ To encourage the RL agent to learn appropriate traffic behaviors, the following 
 \end{cases}
 \]
 
+% TODO:
+% Implement all figures previously discussed.
+% Rewrite first 3 Sections
+% Include Figure for VAE
+% Include Figure describing Waypoints and additional state features
+% Include links to .mp4 of vehicle driving successfully?
+% Improve Code Comments
 
 
 \end{document}
