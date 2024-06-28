@@ -9,6 +9,9 @@
 \usepackage{caption}
 \usepackage[margin=0.6in]{geometry}
 \usepackage{pdflscape}
+\usepackage{subcaption} %  for subfigures environments 
+\graphicspath{ {Pictures_and_Figures/} }
+
 \title{CARLA Leave-Over Documentation}
 \author{Hunter White}
 \date{April 2024}
@@ -89,26 +92,79 @@ CARLA provides a number of examples that are useful for checking that CARLA and 
 
 \subsection{Opening a CARLA server instance: Windows}
 \label{sec:CARLAserverwindows}
-To open a carla instance on Windows, first open the terminal by pressing "ctrl+x" and selecting terminal. Depending on your windows preferences and configuration, this will open either a powershell instance or a command promptinstance. For our purposes, they are largely interchangeable, although powershell may be more familiar if you have previous experience. In your terminal, navigate to the CARLA folder by using the change directory function, abbreviated cd. 
+To open a carla instance on Windows, first open the terminal by pressing "ctrl+x" and selecting terminal. Depending on your windows preferences and configuration, this will open either a powershell instance or a command prompt instance. For our purposes, they are largely interchangeable, although powershell may be more familiar if you have previous experience. In your terminal, navigate to the CARLA folder by using the change directory function, abbreviated cd.  
+Opening powershell via the Anaconda Navigator shortcut yields:
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth, trim=0cm 4.5cm 0cm 0cm, clip]{Command_Prompt_1}
+\caption{PowerShell Prompt launched from Anaconda Navigator}
+\label{fig:com_prompt1}
+\end{figure}
 \\
-I have extracted CARLA to \begin{verbatim} C:\WindowsNoEditor \end{verbatim}.
-\\
- \textbf{insert command line figure showing cd to carla directory.}
-If you are having trouble navigating to your CARLA directory, you can copy the path to your directory by finding the directory in file explorer and  right clicking on the "TOP MIDDLE WINDOW THINGY?" and selecting copy address as text. You can then paste the address into your terminal after the call to change directory.
-Alternatively, you can navigate through your files and directories by using a combination of ls, which lists the files and directories within the current directory, and cd. 
+I have extracted CARLA to \begin{verbatim} D:\Hunter_White\WindowsNoEditor \end{verbatim} and can navigate to that directory by using the change directory "cd" function mentioned above.
 
-To start an instance of CARLA after navigating to the CARLA directory, simply run the command \begin{verbatim} .\CARLAUE4.exe \end{verbatim} in the terminal. A black window should pop up on the screen. After a few moments, the window should load to the default town for your version of CARLA. In CARLA 0.9.8, it should look like this:
-\\ 
-\textbf{Insert default carla window here for 0.9.8}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth, trim=0cm 4.5cm 0cm 0cm, clip]{Command_Prompt_2} %trim= left,bottom,right,top
+\caption{Entering change directory function}
+\label{fig:com_prompt2}
+\end{figure}
 
-You can use the WASDQE keys to navigate the spectator camera around the default map. There's not much to see, as we haven't loaded in vehicles, pedestrians, etc. (a.k.a. "Actors"), but this will give you a feel for how smoothly CARLA runs on your device.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth, trim=0cm 4.5cm 0cm 0cm, clip]{Command_Prompt_3}
+\caption{Example of PowerShell instance after using change directory}
+\label{fig:com_prompt3}
+\end{figure}
+
+The "list" command (abbreviated ls) can be used to list files and directories inside the current directory. This can be useful to double check that the required files are in the working directory.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Command_Prompt_4}
+\label{fig:com_prompt4}
+\caption{Output of using ls within the CARLA directory}
+\end{figure}
+
+If you are having trouble navigating to your CARLA directory using the command line, you can copy the path to your directory by finding the directory in file explorer and right clicking on the address window and selecting copy address as text. You can then paste the address into your terminal after the call to change directory.
+
+To start an instance of CARLA after navigating to the CARLA directory, simply run the command \begin{verbatim} .\CarlaUE4.exe \end{verbatim} in the terminal. A black window should pop up on the screen. After a few moments, the window should load to the default town for your version of CARLA. In CARLA 0.9.8, it should look like this:
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Command_Prompt_5}
+\caption{Starting a CARLA instance from the command line}
+\label{fig:com_prompt5}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{CARLA_0_9_8 Default_Screen}
+\caption{Default load screen for CARLA 0.9.8}
+\label{fig:default_load}
+\end{figure}
+
+You can use the WASDQE keys to navigate the spectator camera around the default map. There's not much to see as no additional vehicles, pedestrians, etc. (a.k.a. "Actors"), but navigating the spectator around the empty map should provide a benchmark for the device's performance during a CARLA instance.
 
 \subsection{running an example script}
-To add in some actors, we will need to open an additional terminal window, and make sure the conda environment is activated. The easiest way to do this is to install the powershell/command prompt shortcut in anaconda navigator, or by typing conda activate <your CARLA environment name>. You will see the name of your environment in parenthesis in your terminal prompt if you have successfully activated your environment. Next, navigate to the Python API examples directory within your CARLA directory using the terminal window with your activated conda environment. the examples directory should have a path similar to :
-\begin{verbatim}<your_carla_directory>\PythonAPI\.examples  \end{verbatim}
+To add in some actors, we will need to open an additional terminal window, and make sure the conda environment is activated. The easiest way to do this is to install the powershell/command prompt shortcut in anaconda navigator, or by typing conda activate "$<\text{your CARLA environment name}>$". You will see the name of your environment in parenthesis in your terminal prompt if you have successfully activated your environment. Next, navigate to the Python API examples directory within your CARLA directory using the terminal window with your activated conda environment. the examples directory should have a path similar to :
+\begin{verbatim}<your_carla_directory>\PythonAPI\examples  \end{verbatim}
+from here, any of the example scripts can be run using the syntax \begin{verbatim} python <example_name>.py \end{verbatim} 
+It can be useful to launch \begin{verbatim} manual_control.py \end{verbatim} which allows the user to manually control a vehicle using the keyboard, to get a feel for how CARLA reports collisions and lane intrustions. This example, and the corresponding \begin{verbatim} manual_control_steeringwheel.py \end{verbatim} are also exceptionally useful for understanding how to integrate PyGame and outside control commands into a CARLA environment.
+Experimenting with the example scripts is a great way to understand how to interact with CARLA and can serve as a great template for writing your own scripts. Other scripts included in the  \begin{verbatim}<your_carla_directory>\PythonAPI\carla\agents\navigation  \end{verbatim} directory can be useful for understanding the basics of path planning and route creation.
 
-from here, running any of the example scripts should work. My personal favorite is \begin{verbatim} manual_control.py \end{verbatim}, which allows the user to manually control a vehicle using the keyboard. This example, and the corresponding \begin{verbatim} manual_control_steeringwheel.py \end{verbatim} , are also exceptionally useful for understanding how to integrate PyGame and outside control commands into a CARLA environment.
-Experimenting with the example scripts is a great way to understand how to interact with CARLA and can serve as a great template for writing your own scripts. Other scripts included in the  \begin{verbatim}<your_carla_directory>\PythonAPI\.carla\agents\navigation  \end{verbatim} directory can be useful for understanding the basics of path planning and route creation.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{manual_control_cmd}
+\caption{Example of calling \text{manual\_control.py} in the command window}
+\label{fig:manual_control_cmd}
+\end{figure}
+\newpage
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{manual_control_example}
+\caption{Corresponding \text{manual\_control.py} PyGame window}
+\label{fig:manual_control_example}
+\end{figure}
 
 \section{Driving Simulator Hardware}
 The steering wheel and pedals have been modified from a \href{https://www.logitechg.com/en-sa/products/driving/driving-force-racing-wheel.941-000123.html}{Logitech G920 Driving Force Racing Wheel and Pedals for Xbox}.  These modifications and the manufactured base for the wheel and pedals were created by a previous senior design team. Their accompanying documentation can be found as a .zip file \href{https://alabama.box.com/s/ppm0j7ax0zvq7z98z6g3qv7kapbet37a}{here}. \textbf{NOTE: I have changed the microcontroller from the Atmel ATSAMC21N18A to an Arduino Uno Rev3}. I had issues understanding and using the Atmel microcontroller, but you are welcome to reintegrate it if you so desire. The rest of the user manual and parts lists/files are unchanged and are still valid. 
