@@ -9,8 +9,8 @@
 \usepackage{caption}
 \usepackage[margin=0.6in]{geometry}
 \usepackage{pdflscape}
-\usepackage{subcaption} %  for subfigures environments 
-\graphicspath{ {Pictures_and_Figures/} }
+\usepackage{float} %  for subfigures environments 
+\graphicspath{ {Pictures_and_Figures/Compressed/} }
 
 \title{CARLA Leave-Over Documentation}
 \author{Hunter White}
@@ -26,22 +26,24 @@
 
 \section{Overview}
 \label{sec:Overview}
-This document is intended to serve as a resource for getting started with the "open-source driving simulator for autonomous driving research" known as Car Learning to Act \href{https://carla.org/}{CARLA}. It includes a description of CARLA, the steps taken to install and configure CARLA on both lab computers, and the scripts, terminal commands, and workflow for interacting with CARLA that may be useful. A significant effort is made to include solutions to errors that may be encountered during the installation and initialization processes, as well as links to StackOverflow/Linux Forums/CARLA Documentation pages that proved useful in the troubleshooting and error correction processes.
-\section{Creating the Simulation Environment}
+This document is intended to serve as a resource for getting started with the "open-source driving simulator for autonomous driving research" known as Car Learning to Act \href{https://carla.org/}{CARLA}, as well as an overview and summary of the PPO-based machine learning approach to control an autonomous vehicle using a single low-resolution pre-processed camera. It includes a description of CARLA, the steps taken to install and configure CARLA on both lab computers, and the scripts, terminal commands, and workflow for interacting with CARLA. A significant effort is made to include solutions to errors that may be encountered during the installation and initialization processes, as well as links to StackOverflow/Linux Forums/CARLA Documentation pages that proved useful in the troubleshooting and error correction processes.
 
-\subsection{Environment setup and package installation}
+\section{Python Requirements and Virtual Environments}
+\subsection{Virtual Environment Setup and Package Installation}
 \subsubsection{Package and Environment Managers}
 \label{subsec: Environment Managers}
-\textbf{Definitely Review For Consistency}\\
-\href{https://www.anaconda.com/}{Anaconda} is used as the package and environment manager. \href{https://www.anaconda.com/products/navigator}{Anaconda Navigator} vastly simplifies the package and environment management problem by providing a relatively simple, if a little bloated, graphical user interface for managing virtual environments, with shortcuts to launch common programs with the conda environment activated. This proved especially useful when initially exploring the best (read: easiest to integrate with existing machine learning research on GitHub) version of python and CARLA to work with. Most packages can be installed via conda or pip, although some require one or the other. A short comparison between conda and pip is given \href{https://www.anaconda.com/blog/understanding-conda-and-pip}{on the conda blog} Special care should be taken to install all possible packages with one installer and then the other if necessary, as conda does not communicate with pip and vice-versa. % Should probably find a better way to word this. 
-A getting started guide for conda is available \href{https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html}{here}.
-When installing packages with conda, it will be useful to add the conda-forge channel. A guide on how to do that is provided \href{https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/channels.html}{here}.
-Note: Occasionally, updating conda before installing all desired packages will result in a deadlocked environment. Unfortunately, the only way to fix the environment is to delete it and reinstall all desired packages in a new environment. Generally, it is best to update conda before creating a new environment or starting a new project and avoid updating conda otherwise.
-\\
-\subsubsection{Required Packages}
+
+\href{https://www.anaconda.com/}{Anaconda, Inc.}  is a company known for its significant contributions to the data science and machine learning communities through its development of open-source distribution and tools for Python and R programming languages \href{https://www.anaconda.com/products/navigator}{Anaconda Navigator} is a desktop graphical user interface (GUI) that simplifies the process of managing packages and environments for the Anaconda Distribution. It is designed to provide an easy-to-use platform for data scientists and researchers, allowing them to focus on their data analysis and modeling tasks without worrying about the underlying software dependencies and environment configurations. Anaconda Navigator leverages Conda, a package and environment manager, to simplify the installation, update, and removal of packages. There exist other package and environment managers, however, the following installation and setup process will use a combination of Conda and pip, Python's standard package manager. Most packages can be installed via conda or pip, but it is critical to install all possible packages with conda first before installing packages with pip, as as conda does not communicate with pip and vice-versa. % Should probably find a better way to word this. 
+A short comparison between Conda and pip is given \href{https://www.anaconda.com/blog/understanding-conda-and-pip}{on the conda blog}. 
+A getting started guide for Conda is available \href{https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html}{here}.
+When installing packages with Conda, it will be useful to add the conda-forge channel. A guide on how to do that is provided \href{https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/channels.html}{here}.
+Note: Occasionally, updating Conda before installing new packages to an existing environment will result in a deadlocked environment. Unfortunately, the only way to fix the environment is to delete the environment and reinstall all desired packages in a new environment. For this reason, it is best to update conda before creating a new environment or starting a new project.
+
+
+\subsubsection{Installing Required Packages}
 \label{subsec:Requirements}
 \textbf{Be sure to update pip and conda before creating a new environment and downloading packages for CARLA or the provided code.} \\
-To run the provided code, the following packages and python version are/is necessary:
+The following packages and python version are necessary to run the python scripts included with CARLA:
 \begin{table}[h]
 \centering
  \begin{tabular}{| c | c | c |}
@@ -62,19 +64,18 @@ CARLA & 0.9.8 & N/A \\
  psutil & * &  (your-carla-filepath)/carla/PythonAPI/util \\
  py-cpuinfo & * & (your-carla-filepath)/carla/PythonAPI/util \\
  python-tr & * & (your-carla-filepath)/carla/PythonAPI/util \\
- poetry & 1.3.2 & (your-repository-path)/requirements.txt \\
+
  \hline
  \end{tabular}
 \caption{Required packages for CARLA, CARLA examples, and the provided code}
 \label{table:RequirementsTable}
 \end{table}
 
-To install all of the above packages, open your prefered command line interface and activate your conda environment. You can then install the packages in either of the following ways:
+To install all of the above packages, open your preferred command line interface and activate your conda environment. You can then install the packages in either of the following ways:
 
 \begin{enumerate}
 \item(Option 1: Individually) All required packages can be installed by navigating to each \begin{verbatim} requirements.txt \end{verbatim} within your local copy of the \href{https://github.com/hrwhite21/RL_CARLA_ADAS}{GitHub Repository} and running the command \begin{verbatim} pip install -r requirements.txt \end{verbatim} or \begin{verbatim}conda install --yes --file requirements.txt \end{verbatim} in the command prompt with the desired conda environment activated.
 \item(Option 2: Grouped) A single \begin{verbatim} requirements.txt \end{verbatim} file is provided for easier installation with pip. This is installed the same way as described in Option 1. Alternatively, the conda equivalent \begin{verbatim} <environment_name>.yml \end{verbatim} file is also provided. To install the \begin{verbatim} <environment_name>.yml \end{verbatim} file, use the command \begin{verbatim} conda env create -f <environment-name>.yml \end{verbatim} in the command prompt or terminal.
-\item(Note on Poetry) Poetry is included as an alternate package manager, and was used by \href{https://github.com/idreesshaikh}{Idrees Razak} when creating the PPO agent and variational autoencoder that I used as a foundation. Poetry's main function in the repository is to download the legacy versions of PyTorch and CUDA that were used to train the PPO agent and VAE. To install these with Poetry, navigate to the Poetry folder using the command prompt or powershell, then run the command \begin{verbatim} poetry update \end{verbatim} As a disclaimer, I don't think this step is necessary if you would rather install the correct PyTorch and CUDA packages using pip or conda. The legacy versions can be found on the \href{https://pytorch.org/get-started/previous-versions/}{PyTorch website}
 \end{enumerate} 
 
 If you try option 2 and find that packages are missing, please try option 1.
@@ -92,7 +93,7 @@ CARLA provides a number of examples that are useful for checking that CARLA and 
 
 \subsection{Opening a CARLA server instance: Windows}
 \label{sec:CARLAserverwindows}
-To open a carla instance on Windows, first open the terminal by pressing "ctrl+x" and selecting terminal. Depending on your windows preferences and configuration, this will open either a powershell instance or a command prompt instance. For our purposes, they are largely interchangeable, although powershell may be more familiar if you have previous experience. In your terminal, navigate to the CARLA folder by using the change directory function, abbreviated cd.  
+To open a CARLA instance on Windows, first open the terminal by pressing "ctrl+x" and selecting terminal. Depending on your windows preferences and configuration, this will open either a powershell instance or a command prompt instance. For our purposes, they are largely interchangeable, although powershell may be more familiar if you have previous experience. In your terminal, navigate to the CARLA folder by using the change directory function, abbreviated cd.  
 Opening powershell via the Anaconda Navigator shortcut yields:
 \begin{figure}[h]
 \centering
@@ -149,7 +150,7 @@ You can use the WASDQE keys to navigate the spectator camera around the default 
 To add in some actors, we will need to open an additional terminal window, and make sure the conda environment is activated. The easiest way to do this is to install the powershell/command prompt shortcut in anaconda navigator, or by typing conda activate "$<\text{your CARLA environment name}>$". You will see the name of your environment in parenthesis in your terminal prompt if you have successfully activated your environment. Next, navigate to the Python API examples directory within your CARLA directory using the terminal window with your activated conda environment. the examples directory should have a path similar to :
 \begin{verbatim}<your_carla_directory>\PythonAPI\examples  \end{verbatim}
 from here, any of the example scripts can be run using the syntax \begin{verbatim} python <example_name>.py \end{verbatim} 
-It can be useful to launch \begin{verbatim} manual_control.py \end{verbatim} which allows the user to manually control a vehicle using the keyboard, to get a feel for how CARLA reports collisions and lane intrustions. This example, and the corresponding \begin{verbatim} manual_control_steeringwheel.py \end{verbatim} are also exceptionally useful for understanding how to integrate PyGame and outside control commands into a CARLA environment.
+It can be useful to launch \begin{verbatim} manual_control.py \end{verbatim} which allows the user to manually control a vehicle using the keyboard, to get a feel for how CARLA reports collisions and lane intrusions. This example, and the corresponding \begin{verbatim} manual_control_steeringwheel.py \end{verbatim} are also exceptionally useful for understanding how to integrate PyGame and outside control commands into a CARLA environment.
 Experimenting with the example scripts is a great way to understand how to interact with CARLA and can serve as a great template for writing your own scripts. Other scripts included in the  \begin{verbatim}<your_carla_directory>\PythonAPI\carla\agents\navigation  \end{verbatim} directory can be useful for understanding the basics of path planning and route creation.
 
 \begin{figure}[h]
@@ -158,7 +159,7 @@ Experimenting with the example scripts is a great way to understand how to inter
 \caption{Example of calling \text{manual\_control.py} in the command window}
 \label{fig:manual_control_cmd}
 \end{figure}
-\newpage
+
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{manual_control_example}
@@ -170,40 +171,94 @@ Experimenting with the example scripts is a great way to understand how to inter
 The steering wheel and pedals have been modified from a \href{https://www.logitechg.com/en-sa/products/driving/driving-force-racing-wheel.941-000123.html}{Logitech G920 Driving Force Racing Wheel and Pedals for Xbox}.  These modifications and the manufactured base for the wheel and pedals were created by a previous senior design team. Their accompanying documentation can be found as a .zip file \href{https://alabama.box.com/s/ppm0j7ax0zvq7z98z6g3qv7kapbet37a}{here}. \textbf{NOTE: I have changed the microcontroller from the Atmel ATSAMC21N18A to an Arduino Uno Rev3}. I had issues understanding and using the Atmel microcontroller, but you are welcome to reintegrate it if you so desire. The rest of the user manual and parts lists/files are unchanged and are still valid. 
 
 \subsection{Electrical Information}
-The power for the driving system and its components (arduino, steering wheel, pedals, motors, motor controllers) is provided by several electrical connections.
+The power for the driving system and its components (Arduino, steering wheel, pedals, motors, motor controllers) is provided by several electrical connections.
 \begin{enumerate}
 
-\item(Steering Wheel and Pedals ) The steering wheel and pedals are connected to the alienware desktop computer via a USB connection. This connection allows the steering wheel and pedals to report changes in state to the computer, and it necessary for the steering wheel and pedals to be recognized by other programs. The displacement of the pedals is measured via potentiometers located at the base of the pedals, PICTURED HERE. A Picture of the USB connection can be found below. Power for the force feedback and calibration functionalities of the steering wheel is provided by the power adaptor. This connector must be plugged in initially, and can be power cycled to force the steering wheel to re-center. This connection must be UNPLUGGED prior to using the stepper motors, as the force feedback generated by the powered wheel is stronger than the torque applied by the stepper motor for the steering wheel. A picture of the power adapter is provided below.
+\item(Steering Wheel and Pedals ) The steering wheel and pedals are connected to the alienware desktop computer via a USB connection. This connection allows the steering wheel and pedals to report changes in state to the computer, and it necessary for the steering wheel and pedals to be recognized by other programs. The displacement of the pedals is measured via potentiometers located at the base of the pedals. A Picture of the USB connection can be found below. Power for the force feedback and calibration functionalities of the steering wheel is provided by the power adapter. This connector must be plugged in initially, and can be power cycled to force the steering wheel to re-center. This connection must be UNPLUGGED prior to using the stepper motors, as the force feedback generated by the powered wheel is stronger than the torque applied by the stepper motor for the steering wheel. A picture of the power adapter is provided below.
 
-\item(Arduino Uno) The Arduino Uno is intended to be powered with the USB-A to USB-B cable provided. This cable supplied the arduino with 5V, and also connects the desktop and arduino via serial connection. The serial port can be checked using the Arduino IDE. Connecting the Arduino to the computer is essential for actuating the stepper motors.
+\item(Arduino Uno) The Arduino Uno is intended to be powered with the USB-A to USB-B cable provided. This cable supplied the arduino with 5V, and also connects the desktop and Arduino via serial connection. The serial port can be checked using the Arduino IDE. Connecting the Arduino to the computer is essential for actuating the stepper motors.
 
-A PICTURE OF THE ARDUINO UNO IS PROVIDED BELOW.
-
-\item(Stepper Motor Drivers) The stepper motor drivers used in this project are \href{https://www.amazon.com/SainSmart-Micro-Stepping-Stepper-Driver-ST-M5045/dp/B00DFSF9GE/ref=cm_cr_arp_d_product_top?ie=UTF8}{SainSmart ST-M5045 Microstepping Stepper Drivers}. These motor drivers accept 24-50VDC, can output up to 4.5A, and have numerous settings for microstepping, which is useful in reducing resonance (awful sounds) and torque-to-start in stepper motors. These drivers will need to be upgraded or changed to match more powerful or closed loop encoders.
+\item(Stepper Motor Drivers) The stepper motor drivers used in this project are \href{https://www.amazon.com/SainSmart-Micro-Stepping-Stepper-Driver-ST-M5045/dp/B00DFSF9GE/ref=cm_cr_arp_d_product_top?ie=UTF8}{SainSmart ST-M5045 Microstepping Stepper Drivers}. These motor drivers accept 24-50VDC, can output up to 4.5A, and have numerous settings for micro-stepping, which is useful in reducing resonance (awful sounds) and torque-to-start in stepper motors. These drivers will need to be upgraded or changed to match more powerful or closed loop encoders.
 
 \item(Stepper Motor - Pedals) The stepper motors used for the brake and accelerator pedals are \href{https://www.omc-stepperonline.com/nema-23-bipolar-3nm-425oz-in-4-2a-57x57x114mm-4-wires-stepper-motor-cnc-23hs45-4204s}{Nema 23 Bipolar 3Nm(425oz.in) 4.2A 57x57x113mm 4 Wires Stepper Motor CNC}. This motor can be driven with high voltages (generally - 10x-15x the rated voltage) without issues, and can operate exceptionally quickly without missing steps. These motors are likely fine for continued use, although they could be replaced with similar closed loop stepper motors for guaranteed tracking performance. This replacement would likely be necessary for increased performance and accuracy.
-A PICTURE OF THESE MOTORS IS PROVIDED BELOW
 
 \item(Stepper Motor - Steering Wheel) The stepper motor used to drive the steering wheel is an \href{https://www.automationdirect.com/adc/shopping/catalog/motion_control/stepper_systems/dual_shaft_and_encoder_stepper_motors/stp-mtr-23079d}{Automation Direct STP-MTR-23079D}. This motor is inadequate to drive the steering wheel at the speeds and acceleration required for this application without missing steps, even when driven at 48V. The motor may miss steps for two reasons: it does not produce enough torque to entirely overcome the rotational inertia of the steering wheel and itself, and it cannot be driven at a high enough voltage to overcome the effects of the inductance of its coils on its acceleration. The motor cannot be driven at a higher voltage without replacing the stepper driver (DETAILED IN NEXT SECTION), the power supply (FOLLOWING SECTION), and cannot be made to accept greater amperage, thus limiting its overall maximum torque. A replacement motor should be sized according to the maximum torque required to counter the rotational inertia of the steering wheel and motor at maximum speed, with a caution margin of 10-20 percent. There are numerous other ways to size a stepper motor, and a simple guide can be found in \href{https://forum.arduino.cc/t/stepper-motor-basics/275223}{this forum post}. Alternate solutions may include a stepper brake, an encoder mechanism, and a resized motor.
 
-\item(Power Supply/Supplies) Originally, the stepper motors and motor drivers were powered by a single 24V 15A DC power supply, similar to \href{https://www.amazon.com/Switching-SJHPRMXF-Universal-Regulated-Transformer/dp/B0BWC8J2HY/ref=sr_1_4?crid=2KFHB4ZPW918C&dib=eyJ2IjoiMSJ9.FPK3xtReWIHdljtMiM5tJdXhBQ5q_-IO-pflt5CI00iFDB9iYGMc79Ty_FO0dvSjdtl0D0Zih9khd_51xjQamVo7iaApGN1fatpqVmezqN7-BDClRtcv_gsEr8ofznzE0bb5uG-HI-YOc7R0-aT_jQXBuObvvQguQbhkOHwR9Rz7JSEfk6LCDIEusBev-jj4meyV8GGQBtdx2AE4DfrnhkPKcfrdVDSSCgHEC-I6Ccjzjrr8_a77e0xSFJ9ziQedmuPHjgInys8orLajkbVt0rwaIr624xeHIuU9LhTWBNQ.29UMZP6yEU8jGo2FBFcXFL1GxivPtxQHOTDhLT26qvg&}{this generic amazon posting}. This primary power supply was connected in series with another 24V 15A power supply following\href{https://www.youtube.com/watch?v=jbzb66dCbOc}{this YouTube video}. \textbf{PLEASE BE AWARE: this is generally a bad idea, for numerous reasons. Improperly sized wires, undersized power supply components, and numerous electrical phenomena beyond my comprehension render this a dangerous, hacky solution at best. This should be replaced by a PROPER 48V or 60V power supply at an appropriateamperage rating as soon as possible.}
+\item(Power Supply/Supplies) Originally, the stepper motors and motor drivers were powered by a single 24V 15A DC power supply, similar to \href{https://shorturl.at/lGpR7}{this generic amazon posting}. This primary power supply was connected in series with another 24V 15A power supply following\href{https://www.youtube.com/watch?v=jbzb66dCbOc}{this YouTube video}. \textbf{PLEASE BE AWARE: this is generally a bad idea, for numerous reasons. Improperly sized wires, undersized power supply components, and numerous electrical phenomena beyond my comprehension render this a dangerous, hacky solution at best. This should be replaced by a PROPER 48V or 60V power supply at an appropriate amperage rating as soon as possible.}
+\end{enumerate} 
 
-\end{enumerate}
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{Closeup_Potentiometer_2}
+\caption{Close up picture of the potentiometer located on the accelerator pedal.}
+\label{fig:APP_pot}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth, trim=15.0cm 20.0cm 0.0cm 20.0cm, clip]{Wheel_USB_Cable}
+\caption{USB Cable providing information to and from the steering wheel and pedals}
+\label{fig:SW_USB}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{Wheel_Power_Supply}
+\caption{Power supply that provides the power for the steering wheel's force deeback and calibration functions}
+\label{fig:SW_power_brick}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth, trim=20.0cm 20.0cm 18.0cm 18.0cm, clip]{Arduino_2}%trim= left,bottom,right,top
+\caption{Arduino UNO as integrated in the electrical system}
+\label{fig:Arduino}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{Closeup_Controllers}
+\caption{Stepper Motor Drivers as integrated in the electrical system}
+\label{fig:Stepper_Drivers}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{Pedals_1}
+\caption{Stepper Motors connected to the accelerator and brake pedals}
+\label{fig:pedal_stepper_motors}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{SW_TopDown}
+\caption{Stepper Motor connected to the steering wheel input shaft}
+\label{fig:SW_stepper_motors}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{Hardware_Overview}%trim= left,bottom,right,top
+\caption{POWER SUPPLIES THAT SHOULD BE REPLACED}
+\label{fig:BAD_POWER}
+\end{figure}
+
 \begin{landscape}
 \subsection{Wiring Diagram}
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth, trim=3.5cm 4.5cm 5.0cm 2.5cm, clip,scale=1.5]{Print Schematic_R7.pdf}
+\includegraphics[width=\textwidth, trim=3.5cm 4.5cm 5.0cm 2.5cm, clip,scale=1.5]{Print Schematic_R7.pdf}%trim= left,bottom,right,top
 \caption{Complete wiring diagram for the fully connected electrical system. \textbf{Note:} The colors and sizing of wires may not match, and all connections should be verified before testing circuit functionality}
 \end{figure}
 \end{landscape}
 \newpage
+
 \subsection{Arduino Configuration and Code Walkthrough}
-The Arduino code for interfacing between Python, CARLA, and the Driving Simulator can be found \href{https://github.com/hrwhite21/DriverlessDIL/blob/main/PythonToMotor/PythonToMotor.ino}{here}. In its current implementation, the bits corresponding to the pins for the step and direction function are directly manipulated (set to 1, 0, or -1) instead of being changed via the traditional DigitalRead() and DigitalWrite() functions. This reduces the amount of time required to change the pins by a significant amount. Unfortunately, this makes the code VERY difficult to read and debug. A more understandable version can be found in the \href{https://tinyurl.com/2s4kpnuv}{the commit history for the aruino ".ino" file.}
+The Arduino code for interfacing between Python, CARLA, and the Driving Simulator can be found \href{https://github.com/hrwhite21/DriverlessDIL/blob/main/PythonToMotor/PythonToMotor.ino}{here}. In its current implementation, the bits corresponding to the pins for the step and direction function are directly manipulated (set to 1, 0, or -1) instead of being changed via the traditional DigitalRead() and DigitalWrite() functions. This reduces the amount of time required to change the pins by a significant amount. Unfortunately, this makes the code VERY difficult to read and debug. A more understandable version can be found in the \href{https://tinyurl.com/2s4kpnuv}{the commit history for the Arduino ".ino" file.}
 \\
-To give a quick overview: The script begins by defining the pins connecting the arduino and the motor controllers. It is important to make sure that these pins are correct and the connections are stable. Max displacement values are assigned based on an initial calibration. The max displacement values should be re-defined when changing the length of string attaching the pedals to the motors, the settings on the motor controllers, or after any catastrophic failure type event. The pins as outputsand given initial states in the setup() loop. Serial communication is opened on the COM port corresponding to the Arduino board at the specified baud rate. This serial communication interface is also how python will interact with the arduino. The loop and accompanying functions generally do the following: 
+To give a quick overview: The script begins by defining the pins connecting the Arduino and the motor controllers. It is important to make sure that these pins are correct and the connections are stable. Max displacement values are assigned based on an initial calibration. The max displacement values should be re-defined when changing the length of string attaching the pedals to the motors, the settings on the motor controllers, or after any catastrophic failure type event. The pins as outputs and given initial states in the setup() loop. Serial communication is opened on the COM port corresponding to the Arduino board at the specified baud rate. This serial communication interface is also how python will interact with the Arduino. The loop and accompanying functions generally do the following: 
 \begin{enumerate}
-\item As a debug function : Print the current displacement of the wheel and pedals if it has been longer than "printInterval" milliseconds since the last check. This is not guaranteed to be the true position, and the system should be \hyperref[sec:Calibration]{recalibrated to zero} before interfacing with CARLA/Python.
+\item As a debug function : Print the current displacement of the wheel and pedals if it has been longer than "printInterval" milliseconds since the last check. This is not guaranteed to be the true position, and the system should be \hyperref[sec:Calibration]{re-calibrated to zero} before interfacing with CARLA/Python.
 \item Checks if there is information waiting in the input buffer on the serial port corresponding to the Arduino Uno. 
 \item If there is data available on the buffer, read the buffer until the newline character, Otherwise, return to (1)
 \item Parse the data returned: seperate the read data into 3 values, seperated by a comma.
@@ -213,7 +268,7 @@ To give a quick overview: The script begins by defining the pins connecting the 
 \item Return to (1) 
 \end{enumerate}
 
-This loop generally runs very fast because it directly accesses the arduino pins, and does not rely on slower digitalRead and digitalWrite functions. This does make the arduino code difficult to understand and debug. The response of the motor to a commanded position is limited by a combination of factors, such as the voltage and amperage supplied to the motor, the minimum pulse width of the motor controller, and the rotational inertia of the motor. Setting delayMicros() too low without adjusting the degree of microstepping on the motor controller results in the motor "missing steps" and producing awful sounds. The most recent settings for the motor controllers are provided in the table: 
+This loop generally runs very fast because it directly accesses the Arduino pins, and does not rely on slower digitalRead and digitalWrite functions. This does make the arduino code difficult to understand and debug. The response of the motor to a commanded position is limited by a combination of factors, such as the voltage and amperage supplied to the motor, the minimum pulse width of the motor controller, and the rotational inertia of the motor. Setting delayMicros() too low without adjusting the degree of microstepping on the motor controller results in the motor "missing steps" and producing awful sounds. The most recent settings for the motor controllers are provided in the table: 
 
 \begin{table}[h]
 \centering
@@ -241,13 +296,13 @@ This loop generally runs very fast because it directly accesses the arduino pins
 \subsection{Debugging and Troubleshooting Tips}
 
 Problem: The steering wheel and pedals are not recognized by the computer. \\
-Tip: Ensure that the USB for the wheel and pedals is plugged into the computer. Plug in the power cable (2 prong) for the wheel and pedals. In windowns, search for and open the program "Logitech Gaming Software". The steering wheel and pedals should be visible as two icons, and the wheel should have completed a calibration by rotating back and forth until settling in a central position. The act of unplugging and plugging in the USB and Power cable connections should also recalibrate the wheel to zero. \label{poi:Calibration} \\
+Tip: Ensure that the USB for the wheel and pedals is plugged into the computer. Plug in the power cable (2 prong) for the wheel and pedals. In windows, search for and open the program "Logitech Gaming Software". The steering wheel and pedals should be visible as two icons, and the wheel should have completed a calibration by rotating back and forth until settling in a central position. The act of unplugging and plugging in the USB and Power cable connections should also re-calibrate the wheel to zero. \label{poi:Calibration} \\
 
-Problem: One or multiple stepper motors "steps" even when the arduino is not commanding a step. \\
-Tip: Make sure that the wires connecting the arduino and the stepper motor drivers are not contacting the stepper motors themselves. The stepper motors are constantly energized when the power supply/supplies are connected to AC power, and because of the internal construction of the motors, they can induce voltages in surrounding wires. If the steppers are in contact with a "step" wire, then they may generate "ghost commands".\\
+Problem: One or multiple stepper motors "steps" even when the Arduino is not commanding a step. \\
+Tip: Make sure that the wires connecting the Arduino and the stepper motor drivers are not contacting the stepper motors themselves. The stepper motors are constantly energized when the power supply/supplies are connected to AC power, and because of the internal construction of the motors, they can induce voltages in surrounding wires. If the steppers are in contact with a "step" wire, then they may generate "ghost commands".\\
 
 Problem: The wiring diagram does not match "XYZ" component. \\
-Tip: The wiring diagram was created using KiCAD 8.0, which offers a near-limitless number of color options when creating wire diagrams, but does not include representation for the stepper driver boards or the arduino uno. In reality, only some of these colors used in the wiring diagram are readily available for use. Every effort has been made to balance readibility of the wiring diagram with fidelity to the actual hardware and connections.  As always, cross-referencing the supplier data sheets, google, and using a multimeter to double check that components are receiving the correct voltage and signals will be very helpful troublehsooting steps.\\
+Tip: The wiring diagram was created using KiCAD 8.0, which offers a near-limitless number of color options when creating wire diagrams, but does not include representation for the stepper driver boards or the Arduino UNO. In reality, only some of these colors used in the wiring diagram are readily available for use. Every effort has been made to balance readability of the wiring diagram with fidelity to the actual hardware and connections.  As always, cross-referencing the supplier data sheets, google, and using a multimeter to double check that components are receiving the correct voltage and signals will be very helpful troubleshooting steps.\\
 
 \textbf{additional problems to come, surely}
 
@@ -261,10 +316,10 @@ Several files are included in this project, separated into various folders. Each
 \item FOLDER -- autoencoder : This folder contains all of the python files associated with creating and using the variational autoencoder. Variational Autoencoders (VAEs) are a type of generative model in machine learning, introduced by Kingma and Welling in 2013. VAEs are designed to learn latent representations of input data that can be used to generate new, similar data. Generally, autoencoders are used as feature extractors in reinforcement learning, compressing a complex, high-dimensional observation space into a lower-dimension latent space. Lower dimensional representations are generally easier to learn, and using a VAE can sometimes reduce training time and improve agent robustness to unseen scenarios. For a rather intuitive-yet-complete explanation of variational autoencoders, see \href{https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73}{this post by Joseph and Baptiste Rocca}. Additional readings are available \href{https://www.cs.toronto.edu/~rgrosse/courses/csc421_2019/slides/lec17.pdf}{from University of Toronto} and \href{https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf}{Irhum Shafkat}
 \item FOLDER -- checkpoints : This folder contains all of the checkpoints for the proximal policy optimization (PPO) machine learning agent on both Town07 and Town02. The checkpoints are made every 100 episodes, and serve as a training log for the agent. These are useful for evaluating how well an agent was performing at different stages of training, but DO NOT contain the actual trained agents.
 \item FOLDER -- copy\_of\_PythonAPI\_for\_reference : This folder is a copy of the PythonAPI folder included in a CARLA installation. The files in these folders are extremely useful for learning how to interact with CARLA via python, and also include helpful functions for creating routes, changing weather, and adding sensors and actors to a CARLA instance. 
-\item FOLDER -- networks - This folder contains the python files that define the structure and functions associated with the PPO agent. These files can be useful for understanding the general structure of the agent and for understanding how to implement the underlying probability distrubutions using PyTorch. The agent used in the training/evaluation simulations is generated from these files.
+\item FOLDER -- networks - This folder contains the python files that define the structure and functions associated with the PPO agent. These files can be useful for understanding the general structure of the agent and for understanding how to implement the underlying probability distributions using PyTorch. The agent used in the training/evaluation simulations is generated from these files.
 \item FOLDER -- preTrained\_models : This folder contains the trained agents associated with the files found in the checkpoint folder. Loading these agents in allows one to reproduce an agent at the corresponding stage of training.
-\item FOLDER -- Simulation : This folder contains all the scripts which define sensor settings, connect python to CARLA, create the machine learning environment, and populate the CARLA simulation with additional actors. The files are relatively self-explanatory, with environemnt.py being the exception.
-\item FILE -- continuous\_driver.py : This file is the equivalent of main.py. It contains all of the information regarding user argument tags, and calls all other necessary functions to connect to a CARLA instance, change the town and weather, create the machine learning agent, and spawn the actor for the machine learning agent to control. This file is also repsonsible for calling the functions to create checkpoints and save models during training.
+\item FOLDER -- Simulation : This folder contains all the scripts which define sensor settings, connect python to CARLA, create the machine learning environment, and populate the CARLA simulation with additional actors. The files are relatively self-explanatory, with environment.py being the exception.
+\item FILE -- continuous\_driver.py : This file is the equivalent of main.py. It contains all of the information regarding user argument tags, and calls all other necessary functions to connect to a CARLA instance, change the town and weather, create the machine learning agent, and spawn the actor for the machine learning agent to control. This file is also responsible for calling the functions to create checkpoints and save models during training.
 \item FILE -- parameters.py : This file contains the information on all machine learning related parameters outside of network structure.
 \item File -- pygame\_test\_joystick.py : This file is important in verifying the functionality of the steering wheel and pedals in python. This script creates a debug display that reports the values for each of the buttons, axes, and directional pads for the steering wheel, pedals, and any other controller connected to the computer that is not a mouse and keyboard. The most common uses of this script are to verify that the steering wheel has returned to a zero position before continuing with training or evaluation.
 \item FILE -- wheel\_config.ini : This file contains the mapping between pygame and the logitech wheel and pedals. This will need to be changed if using a different controller.
@@ -273,7 +328,7 @@ Several files are included in this project, separated into various folders. Each
 
 \subsection{Primer on PPO}
 
-Proximal Policy Optimization (PPO) is a popular reinforcement learning (RL) algorithm designed to train agents to make decisions by interacting with an environment to maximize cumulative rewards. PPO stands out because it strikes a balance between performance and simplicity. PPO is an actor-critic based  policy gradient method. Policy gradient methods optimize the policy directly, as opposed to value-based methods which optimize the value function. In simpler terms, a policy gradient method adjusts the policy (the agent’s behavior) based on feedback from the environment. PPO can be used in both discrete and continous action spaces, which makes it especially versatile - previous implementations of PPO in the fields of robotics and game playing have yielded incredible results. \\
+Proximal Policy Optimization (PPO) is a popular reinforcement learning (RL) algorithm designed to train agents to make decisions by interacting with an environment to maximize cumulative rewards. PPO stands out because it strikes a balance between performance and simplicity. PPO is an actor-critic based  policy gradient method. Policy gradient methods optimize the policy directly, as opposed to value-based methods which optimize the value function. In simpler terms, a policy gradient method adjusts the policy (the agent’s behavior) based on feedback from the environment. PPO can be used in both discrete and continuous action spaces, which makes it especially versatile - previous implementations of PPO in the fields of robotics and game playing have yielded incredible results. \\
 
 \subsection{Key Concepts and Equations}
 \begin{itemize} 
@@ -283,7 +338,7 @@ Proximal Policy Optimization (PPO) is a popular reinforcement learning (RL) algo
 \begin{itemize} 
 \item $(r_\theta(s_t, a_t)$ is the probability ratio between the new and old policies for taking action $a_t$ given state $s_t$, or more simply : \( r_\theta(s_t, a_t) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)} \). 
 \item \( \hat{A}_t \) is the estimate of the advantage function : \( A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s) \).  The advantage function measures how much better taking a particular action $a$ in state $s$ is compared to the average action in that state, under policy $\pi$. The advantage function can be estimated using various methods. One common method is Generalized Advantage Estimation (GAE), which balances bias and variance in the advantage estimates.
-\item $\varepsilon$ is a hyperparamter that controls the clipping range. The clipping mechanism ensures that the updates to the policy do not deviate too much from the old policy by clipping the probability ratio $r_\theta(s_t, a_t)$ to be within  \( [1 - \varepsilon, 1 + \varepsilon]\). This prevents excessively large policy updates that could destabilize training.
+\item $\varepsilon$ is a hyperparameter that controls the clipping range. The clipping mechanism ensures that the updates to the policy do not deviate too much from the old policy by clipping the probability ratio $r_\theta(s_t, a_t)$ to be within  \( [1 - \varepsilon, 1 + \varepsilon]\). This prevents excessively large policy updates that could destabilize training.
 \end{itemize}
 \item The Generalized Advantage Estimation (GAE) is calculated as \( \hat{A}_t = \delta_t + (\gamma \lambda) \delta_{t+1} + (\gamma \lambda)^2 \delta_{t+2} + \ldots \)
 
@@ -299,9 +354,9 @@ The goal of this project is to develop a reinforcement learning (RL) agent
 % specifically using Proximal Policy Optimization (PPO),  NOT SURE About this line
 to autonomously drive a vehicle within the CARLA simulation environment. The agent should effectively navigate urban and rural traffic scenarios, obey simple traffic rules, and be able to maintain a reasonable driving speed. The RL agent should process a visual input, either from CARLA or from a webcam directed at the screen, as well as vehicle telematic information, and output a corresponding tuple of (steering action, acceleration action, braking action).
 \subsection{Training and Environment Setup}
-The RL agent is implemented in Python 3.7.*, and utilizes the packages listed in \hyperlink{table:RequirementsTable}{requirements table}. Simulations and trainings were run on a system using an Nvidia Titan X, a 4-core Intel i7, and 32 GB of DDR4. The backbone of the training and implementation was adapted from \href{https://github.com/idreesshaikh/Autonomous-Driving-in-Carla-using-Deep-Reinforcement-Learning/tree/main}{this GitHub repository}, available under the MIT License. For compatability reasons, CARLA 0.9.8 with additional maps is used for training and evaluation. \\
+The RL agent is implemented in Python 3.7.*, and utilizes the packages listed in \hyperlink{table:RequirementsTable}{requirements table}. Simulations and trainings were run on a system using an Nvidia Titan X, a 4-core Intel i7, and 32 GB of DDR4. The backbone of the training and implementation was adapted from \href{https://github.com/idreesshaikh/Autonomous-Driving-in-Carla-using-Deep-Reinforcement-Learning/tree/main}{this GitHub repository}, available under the MIT License. For compatibility reasons, CARLA 0.9.8 with additional maps is used for training and evaluation. \\
 The PPO Agent is composed of an actor network and a critic network. These networks are constructed of 3 fully-connected layers, with 500 , 300, and 100 nodes, each with a hyperbolic tangent activation function. The output layer of the actor network contains $a_{dim}$ nodes, corresponding to the size of the action space, and uses a $\tanh$ activation function. For this project, $a_{dim} = 3; \text{a tuple of (steer, throttle, brake)} $. The output layer of the critic network contains a single node, which represents an estimation of the state-value function. This layer contains no activation function. \\
-The input to each network consists of the output of the VAE ([120,1]) and the following external features: current vehicle speed, previous steer action, current throttle/accelerator pedal position value, distance to the road center, and angular deviation from intended trajectory. \textbf{The Following Figure is included as a reference}:
+The input to each network consists of the output of the VAE ([95,1]) and the following external features: current vehicle speed, previous steer action, current throttle/accelerator pedal position value, distance to the road center, and angular deviation from intended trajectory. \textbf{The Following Figure is included as a reference}:
 
 A simulation may be terminated for violating the following reasons: \\
 \begin{itemize}
@@ -316,7 +371,7 @@ A simulation may be terminated for violating the following reasons: \\
 \subsection{State and Action Spaces}
 The state space of the agent consists of the encoded result of the VAE, plus the five external features mentioned above. The action space consists of the tuple (steer, throttle, brake), with the values being continuous and bounded by the sets $\left([-1,1],[0,1],[0,1]\right)$.
 
-\subsection{Reward Structure}
+\subsection{Reward Structure} /
 To encourage the RL agent to learn appropriate traffic behaviors, the following reward structure is used:
 \[ \alpha_{reward}= \begin{cases}
 1- | \frac{\alpha_{\text{deviation}}}{\alpha_{\text{max deviation}}} | & \alpha_{\text{deviation}} < \alpha_{\text{max deviation}} \\
