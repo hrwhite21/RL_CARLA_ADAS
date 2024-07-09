@@ -5,9 +5,9 @@
 // const int SWstepPin = 6;   // Step pin connected to digital pin 6
 // const int SWdirPin = 7;    // Direction pin connected to digital pin 7
 
-const int delayMicros = 425; // 5000 microseconds = 5 milliseconds
-const int APPMaxDisplacement = 690; 
-const int BPPMaxDisplacement = 660;
+const int delayMicros = 500; // 5000 microseconds = 5 milliseconds
+const int APPMaxDisplacement = 700; 
+const int BPPMaxDisplacement = 600;
 const int SWMaxDisplacement = 400;
 
 int APPPos = 0;
@@ -81,15 +81,15 @@ void constrainVals(int values[]) {
 
 void StepHandler(int values[]) {
 
-  if (APPPos < values[0]) {
+  if (APPPos > values[0]) {
     PORTD |= (1 << PD3);
-  } else if (APPPos > values[0]) {
+  } else if (APPPos < values[0]) {
     PORTD &= ~(1 << PD3);
   }
 
-  if (BPPPos > values[1]) {
+  if (BPPPos < values[1]) {
     PORTD |= (1 << PD5);
-  } else if (BPPPos < values[1]) {
+  } else if (BPPPos > values[1]) {
     PORTD &= ~(1 << PD5);
   }
 
@@ -99,16 +99,16 @@ void StepHandler(int values[]) {
     PORTD &= ~(1 << PD7);
   }
 
-  int APPDirMultiplier = (PORTD & (1 << PD3)) ? 1 : -1;
-  int BPPDirMultiplier = (PORTD & (1 << PD5)) ? -1 : 1;
+  int APPDirMultiplier = (PORTD & (1 << PD3)) ? -1 : 1;
+  int BPPDirMultiplier = (PORTD & (1 << PD5)) ? 1 : -1;
   int SWDirMultiplier = (PORTD & (1 << PD7)) ? 1 : -1;
-  // Serial.print("APPDirMultiplier ");
-  // Serial.print(APPDirMultiplier);
-  // Serial.print(" BPPDirMultiplier ");
-  // Serial.print(BPPDirMultiplier);
-  // Serial.print(" SWDirMultiplier ");
-  // Serial.print(SWDirMultiplier);
-  // Serial.println(" Done");
+  //Serial.print("APPDirMultiplier ");
+  //Serial.print(APPDirMultiplier);
+  //Serial.print(" BPPDirMultiplier ");
+  //Serial.print(BPPDirMultiplier);
+  //Serial.print(" SWDirMultiplier ");
+  //Serial.print(SWDirMultiplier);
+  //Serial.println(" Done");
 
   while (APPPos != values[0] || BPPPos != values[1] || SWPos != values[2]) {
     if (APPPos != values[0]) {
@@ -131,13 +131,13 @@ void StepHandler(int values[]) {
     PORTD &= ~(1 << PD2);
     PORTD &= ~(1 << PD4);
     PORTD &= ~(1 << PD6);
-    // Serial.print("A: ");
-    // Serial.print(APPPos);
-    // Serial.print(" B: ");
-    // Serial.print(BPPPos);
-    // Serial.print(" SW: ");
-    // Serial.print(SWPos);
-    // Serial.println(" Done ");
+    //Serial.print("A: ");
+    //Serial.print(APPPos);
+    //Serial.print(" B: ");
+    //Serial.print(BPPPos);
+    //Serial.print(" SW: ");
+    //Serial.print(SWPos);
+    //Serial.println(" Done ");
     
   }
 }
